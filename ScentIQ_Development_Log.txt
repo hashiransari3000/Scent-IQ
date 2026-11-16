@@ -4,10 +4,11 @@ SCENTIQ - MASTER DEVELOPMENT LOG AND BUILD PLAN
 Project      : ScentIQ - Intelligent Personalized Fragrance Recommendation
 Owner        : Hashir
 Started      : 2026-11-16
-Status       : v1 code complete and QA-verified (Phases 0-10); deployment
-               config ready - live hosting pending account authorization
+Status       : v1 LIVE on the web (Phases 0-10); ML API hosting pending because
+               Render now requires a card for identity verification
 Repo         : https://github.com/hashiransari3000/Scent-IQ
-Production   : TBD (free Vercel + Render URLs; see docs/DEPLOYMENT.md)
+Production   : Web - https://scent-iq.vercel.app (live)
+               API - pending a no-card host or a Render payment method
 Budget       : $0.00 (hard constraint)
 Log rule     : This file is the single source of truth. Append every work session.
 
@@ -932,6 +933,25 @@ Mobile performance                Medium  CSS/SVG art, lazy charts, budget check
   it exited, non-interactive pushes fail. User must sign in / provide a scoped
   token, then run: git push origin main.
   Lesson: any CI step that runs tsc must generate Next's route types first.
+  Resolved: authenticated Git Credential Manager to GitHub (hashiransari3000),
+  pushed 49afdba + ffb1d62, and CI run 43868858191 finished green on all three
+  jobs (web lint/types/build, ML tests, API tests).
+
+2026-11-16 | Deploy | WEB IS LIVE at https://scent-iq.vercel.app.
+  Vercel dashboard's new monorepo "Services" flow would not keep apps/web as the
+  root in the import form, so I used the authenticated Vercel CLI from
+  apps/web instead: vercel link --project scent-iq, then vercel --prod.
+  Build completed in 43s, alias assigned, HTTP 200, correct page title.
+  Set NEXT_PUBLIC_SITE_URL=https://scent-iq.vercel.app in Production and
+  redeployed. Deployment READY. No secrets are tracked: Vercel wrote a local
+  .env.local (OIDC) that stays ignored; root/app .vercel folders are ignored.
+  API BLOCKER: Render's free Blueprint now requires a credit card for identity
+  verification (temporary $1 authorization). User is on a $0 constraint, so no
+  card was entered. Options: (a) user adds a card on Render, (b) switch the API
+  to Hugging Face Spaces Docker (no card), (c) run without the live API and use
+  the on-device ranker. Frontend currently falls back locally on first refusal.
+  Next: pick an API host, set NEXT_PUBLIC_API_BASE_URL, redeploy web, then run
+  the post-deploy checks.
 
 --------------------------------------------------------------------------------
 18. DECISION LOG
@@ -995,6 +1015,14 @@ D-018 | 2026-11-16 | No live Supabase project for v1; migration SQL is prepared
   but not applied.
   Reason: no catalogue or user data needs server persistence yet, and an unused
   project with a service-role key is pure risk. Secrets stay in placeholders.
+D-019 | 2026-11-16 | Deploy the web app with the Vercel CLI, not the dashboard
+  importer.
+  Reason: Vercel's monorepo Services UI reset the root directory from apps/web
+  back to the repo root (and the hidden in-app browser rendered 0x0 targets).
+  Running vercel from apps/web produces the same linked project without UI risk.
+D-020 | 2026-11-16 | Do not enter payment details to unlock Render Free.
+  Reason: the project's hard constraint is $0 and financial data must be entered
+  by the account holder, never by the agent. A no-card host is preferred.
 
 --------------------------------------------------------------------------------
 19. IMMEDIATE NEXT ACTIONS
@@ -1009,22 +1037,24 @@ DONE (2026-11-16):
 [x] Deployment scaffolding: render.yaml, ci.yml, keepalive.yml,
     docs/DEPLOYMENT.md, README, docs/media screenshots.
 [x] Git identity set repo-locally and v1 pushed to origin/main (ba175ce).
+[x] Pushed 49afdba + ffb1d62; CI run 43868858191 green on web, ML and API.
+[x] WEB IS LIVE: https://scent-iq.vercel.app (Vercel CLI, Production, HTTP 200).
 
-NEXT (requires the user's accounts, in this order):
-1. [x] Push commit ba175ce to https://github.com/hashiransari3000/Scent-IQ.
-   [ ] Re-authenticate git and push 49afdba (CI typecheck fix), then confirm
-       all three CI jobs are green for the latest commit.
-   Important: the deployed web build must come from the fixed commit.
-2. Render: New > Blueprint > select the repo > Apply. Note the service URL and
-   confirm GET /health returns status ok with 1,478 perfumes.
-3. Vercel: Add Project > import the repo > Root Directory apps/web > env
-   NEXT_PUBLIC_API_BASE_URL=<render-url> and NEXT_PUBLIC_SITE_URL=<vercel-url>
-   > Deploy.
-4. GitHub repo Variables: API_HEALTH_URL=<render-url>/health and
-   WEB_URL=<vercel-url> so keepalive.yml works; run it once manually.
-5. Tighten ALLOWED_ORIGINS on Render to the Vercel domain, redeploy, and
-   re-check /health + one /v1/recommend call from the browser.
-6. Update this log with the live URLs and move the header status to LIVE.
+NEXT (API only):
+1. Pick the API host:
+   a. Render - fastest, but the account holder must add a card for the $1
+      identity check; then New > Blueprint > Apply and copy /health URL.
+   b. Hugging Face Spaces - $0 and no card; needs a free HF account and a
+      Docker Space that clones this repo (adapt Dockerfile to port 7860).
+   c. No API for now - the web app stays usable through the on-device ranker,
+      labelled honestly.
+2. Set NEXT_PUBLIC_API_BASE_URL to the chosen API URL in Vercel Production and
+   redeploy: cd apps/web && vercel --prod --yes.
+3. Verify GET /health, then one /v1/recommend call from the live site and the
+   "Live hybrid model" badge on /discover.
+4. If Render: add repo Variables API_HEALTH_URL and WEB_URL, run keepalive.yml
+   once, and tighten ALLOWED_ORIGINS to https://scent-iq.vercel.app.
+5. Update this log and README with the API URL and final status.
 
 AFTER LAUNCH (choose one):
 [ ] Supabase accounts: schema + RLS, migrate profile/feedback, retrain hook.
@@ -1032,6 +1062,7 @@ AFTER LAUNCH (choose one):
 [ ] Both, starting with the academic pack if a defense date is near.
 
 STILL OPEN FROM THE USER:
+[ ] API host decision (Render card / Hugging Face / on-device only).
 [ ] Resend the workflow diagram (the earlier attempt arrived empty).
 [ ] Deadline / defense date.
 [ ] Whether Streamlit is a hard requirement for the university submission.

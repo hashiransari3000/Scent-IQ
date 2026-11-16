@@ -2,6 +2,8 @@
 
 **An intelligent, explainable fragrance recommender — not another perfume list.**
 
+**Live:** https://scent-iq.vercel.app
+
 ScentIQ turns 1,478 perfumes into a searchable scent space, learns what you like
 from a 90-second profile and your feedback, and recommends bottles with a match
 score plus the reasons behind it. Built as a portfolio-grade full-stack + ML
@@ -164,12 +166,15 @@ tiers, never fabricated retail prices.
 
 ## Status and roadmap
 
-Shipped: catalogue, perfume pages, onboarding, hybrid discovery, explanations,
-feedback, profile, scent map, PWA, SEO, CI, deployment configuration.
+Shipped: live web app at https://scent-iq.vercel.app, catalogue, perfume pages,
+onboarding, hybrid discovery, explanations, feedback, profile, scent map, PWA,
+SEO, CI, deployment configuration. The Python ranking API is wired for Render but
+awaits a payment method on the free tier; until then discovery uses the
+on-device ranker.
 
 Next, in priority order:
 
-- Public deployment credentials → live URL + screenshots/badges.
+- Live ML API URL and redeploy (Render Blueprint or Hugging Face Spaces).
 - Supabase: anonymous feedback table with RLS, optional accounts, cross-device
   profiles.
 - Community ratings/reviews (original content) and saved collections.
