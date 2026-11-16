@@ -4,11 +4,11 @@ SCENTIQ - MASTER DEVELOPMENT LOG AND BUILD PLAN
 Project      : ScentIQ - Intelligent Personalized Fragrance Recommendation
 Owner        : Hashir
 Started      : 2026-11-16
-Status       : v1 LIVE on the web (Phases 0-10); ML API hosting pending because
-               Render now requires a card for identity verification
+Status       : v1 LIVE on the web (Phases 0-10); ML API image + deployment docs
+               ready for a free Hugging Face Docker Space (account step pending)
 Repo         : https://github.com/hashiransari3000/Scent-IQ
 Production   : Web - https://scent-iq.vercel.app (live)
-               API - pending a no-card host or a Render payment method
+               API - https://<hf-user>-scentiq-api.hf.space (Space not created yet)
 Budget       : $0.00 (hard constraint)
 Log rule     : This file is the single source of truth. Append every work session.
 
@@ -953,6 +953,20 @@ Mobile performance                Medium  CSS/SVG art, lazy charts, budget check
   Next: pick an API host, set NEXT_PUBLIC_API_BASE_URL, redeploy web, then run
   the post-deploy checks.
 
+2026-11-16 | API host | Chose Hugging Face Spaces (Docker, free CPU, no card).
+  Prepared docs/huggingface-space/Dockerfile (python:3.12-slim, clones this
+  public repo at build, installs ml + API requirements, runs as UID 1000 on
+  port 7860, bakes ALLOWED_ORIGINS for the Vercel origin, /health healthcheck)
+  and the Space card README (sdk: docker, app_port: 7860). Committed eee20c8
+  and pushed; docs/DEPLOYMENT.md documents the no-card path next to Render.
+  Blocker: creating the Space needs a free Hugging Face account. The signup
+  form accepts only email + password (no GitHub/Google button, unlike Vercel),
+  so the account holder must sign up or log in; no credentials were requested,
+  typed or stored. Next: create the Space, upload the two files, wait for the
+  build, copy https://<user>-scentiq-api.hf.space, set
+  NEXT_PUBLIC_API_BASE_URL in Vercel Production, redeploy, verify /health and
+  the "Live hybrid model" badge.
+
 --------------------------------------------------------------------------------
 18. DECISION LOG
 --------------------------------------------------------------------------------
@@ -1023,6 +1037,12 @@ D-019 | 2026-11-16 | Deploy the web app with the Vercel CLI, not the dashboard
 D-020 | 2026-11-16 | Do not enter payment details to unlock Render Free.
   Reason: the project's hard constraint is $0 and financial data must be entered
   by the account holder, never by the agent. A no-card host is preferred.
+D-021 | 2026-11-16 | Host the ranking API on a Hugging Face Docker Space.
+  Reason: $0 with no card, builds straight from this public repo, 16 GB RAM,
+  static URL, and no secrets needed. Trade-off: free Spaces sleep after ~48 h
+  and cold-start in 30-60 s; the on-device ranker covers that window and the UI
+  labels the source honestly. Render remains the warm alternative if a card is
+  ever added.
 
 --------------------------------------------------------------------------------
 19. IMMEDIATE NEXT ACTIONS
@@ -1040,21 +1060,21 @@ DONE (2026-11-16):
 [x] Pushed 49afdba + ffb1d62; CI run 43868858191 green on web, ML and API.
 [x] WEB IS LIVE: https://scent-iq.vercel.app (Vercel CLI, Production, HTTP 200).
 
-NEXT (API only):
-1. Pick the API host:
-   a. Render - fastest, but the account holder must add a card for the $1
-      identity check; then New > Blueprint > Apply and copy /health URL.
-   b. Hugging Face Spaces - $0 and no card; needs a free HF account and a
-      Docker Space that clones this repo (adapt Dockerfile to port 7860).
-   c. No API for now - the web app stays usable through the on-device ranker,
-      labelled honestly.
-2. Set NEXT_PUBLIC_API_BASE_URL to the chosen API URL in Vercel Production and
-   redeploy: cd apps/web && vercel --prod --yes.
-3. Verify GET /health, then one /v1/recommend call from the live site and the
-   "Live hybrid model" badge on /discover.
-4. If Render: add repo Variables API_HEALTH_URL and WEB_URL, run keepalive.yml
-   once, and tighten ALLOWED_ORIGINS to https://scent-iq.vercel.app.
-5. Update this log and README with the API URL and final status.
+NEXT (API only; host chosen: Hugging Face Spaces, D-021):
+1. Account holder signs up or logs in at https://huggingface.co/join. No card,
+   and no password is shared with the agent.
+2. New Space -> scentiq-api -> Docker -> Blank -> CPU basic (free). Upload
+   docs/huggingface-space/README.md and Dockerfile at the Space root; wait for
+   the build.
+3. Copy https://<user>-scentiq-api.hf.space and check GET /health returns
+   status ok with 1,478 perfumes.
+4. Set NEXT_PUBLIC_API_BASE_URL to that URL in Vercel Production and redeploy:
+   cd apps/web && vercel --prod --yes.
+5. Verify one /v1/recommend call from the live site and the "Live hybrid model"
+   badge on /discover.
+6. Update this log and README with the API URL and final status.
+Fallback if the Space is blocked: Render Blueprint (needs a card) or on-device
+only.
 
 AFTER LAUNCH (choose one):
 [ ] Supabase accounts: schema + RLS, migrate profile/feedback, retrain hook.
@@ -1062,7 +1082,7 @@ AFTER LAUNCH (choose one):
 [ ] Both, starting with the academic pack if a defense date is near.
 
 STILL OPEN FROM THE USER:
-[ ] API host decision (Render card / Hugging Face / on-device only).
+[ ] Hugging Face account + Space creation (only the account holder can do this).
 [ ] Resend the workflow diagram (the earlier attempt arrived empty).
 [ ] Deadline / defense date.
 [ ] Whether Streamlit is a hard requirement for the university submission.
