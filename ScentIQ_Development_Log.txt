@@ -911,6 +911,23 @@ Mobile performance                Medium  CSS/SVG art, lazy charts, budget check
   Blocker: Vercel/Render projects need the user's account authorization; code
   and config are ready to deploy.
 
+2026-11-16 | Release | Repository published. Set repo-local identity, staged 120
+  files, scanned staged content for secret patterns (none), confirmed only
+  .env.example is tracked and that .env/.screens/node_modules/.next/.venv are
+  excluded. Commit ba175ce "feat: ship ScentIQ v1 fragrance recommendation
+  platform" pushed to origin/main; branch tracking set. Verified production
+  headers with curl (nosniff, DENY, strict-origin-when-cross-origin,
+  camera/mic/geo disabled). GitHub Actions CI queued for ba175ce.
+  Next: watch CI, then Vercel + Render import.
+
+2026-11-16 | CI fix | First CI run on ba175ce: ML and API passed, web failed at
+  typecheck. Cause: next-env.d.ts is generated and gitignored, so a fresh CI
+  checkout has no Next type references; local tsc only passed because .next
+  existed. Fix: "typecheck" now runs "next typegen && tsc --noEmit", verified by
+  deleting .next + next-env.d.ts and reproducing (typegen regenerates both,
+  tsc exit 0). Re-run queued with the fix commit.
+  Lesson: any CI step that runs tsc must generate Next's route types first.
+
 --------------------------------------------------------------------------------
 18. DECISION LOG
 --------------------------------------------------------------------------------
@@ -986,12 +1003,11 @@ DONE (2026-11-16):
     Permissions-Policy all present on GET /.
 [x] Deployment scaffolding: render.yaml, ci.yml, keepalive.yml,
     docs/DEPLOYMENT.md, README, docs/media screenshots.
+[x] Git identity set repo-locally and v1 pushed to origin/main (ba175ce).
 
 NEXT (requires the user's accounts, in this order):
-1. Git identity + push. Set repo-local git user.name/user.email to the GitHub
-   identity, then push main to
-   https://github.com/hashiransari3000/Scent-IQ. Confirm .env, .screens,
-   node_modules, .venv and .next are absent from the commit.
+1. [x] Push commit ba175ce to https://github.com/hashiransari3000/Scent-IQ.
+   [ ] Watch the CI run for that commit finish green (web, ml, api).
 2. Render: New > Blueprint > select the repo > Apply. Note the service URL and
    confirm GET /health returns status ok with 1,478 perfumes.
 3. Vercel: Add Project > import the repo > Root Directory apps/web > env
