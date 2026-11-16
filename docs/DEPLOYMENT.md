@@ -24,6 +24,10 @@ falls back to an on-device ranker and labels the list "On-device estimate".
 
 ## 2. Deploy the API on Render
 
+> Render's free tier now asks for a payment method for identity verification.
+> If you do not want to add one, use the Hugging Face Spaces alternative below —
+> it is also $0 and needs no card.
+
 1. Render Dashboard → **New +** → **Blueprint**.
 2. Connect the `Scent-IQ` repository. Render reads `render.yaml` from the root.
 3. Apply the blueprint. It creates `scentiq-api` from
@@ -49,6 +53,28 @@ and no write endpoints. After the Vercel domain is final, set it in Render →
 Environment to the exact origin, e.g. `https://scentiq.vercel.app`. Vercel
 preview URLs will then be blocked from live scoring, so only do this once you no
 longer need previews.
+
+### Alternative: Hugging Face Spaces (no card)
+
+1. Create a free account at <https://huggingface.co/join> (email + password;
+   no payment details are ever requested).
+2. **New Space** → name it `scentiq-api` → SDK **Docker** → **Blank** → CPU
+   basic (free) → **Create Space**.
+3. In the Space → **Files** → **Add file** → **Upload files**, upload
+   `docs/huggingface-space/README.md` and `docs/huggingface-space/Dockerfile`
+   (keep exactly those names, at the Space root).
+4. Wait for the build (5–10 min). The URL is
+   `https://<your-hf-username>-scentiq-api.hf.space`; open `/health`:
+
+   ```json
+   {"status":"ok","perfumes":1478,"clusters":6,"treeLeaves":60,...}
+   ```
+
+The Space image clones this repo on every build, so a new commit is picked up
+by **Factory rebuild** in the Space settings. `ALLOWED_ORIGINS` is already baked
+into the image for `https://scent-iq.vercel.app` and localhost. Free Spaces sleep
+after ~48 h without traffic; the first request after that takes 30–60 s, and the
+web app's on-device fallback covers the wait.
 
 ---
 
