@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Offline · ScentIQ</title>
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: #0e0d0b;
+        color: #f5f0e6;
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+        padding: 24px;
+      }
+      main { max-width: 420px; text-align: center; }
+      .mark { width: 72px; height: 72px; margin: 0 auto 28px; display: block; }
+      p.eyebrow {
+        font-size: 10px;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: #e4bf7a;
+        margin: 0 0 14px;
+      }
+      h1 {
+        font-family: Georgia, "Times New Roman", serif;
+        font-weight: 400;
+        font-size: clamp(2.2rem, 8vw, 3rem);
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        margin: 0;
+      }
+      h1 em { color: rgba(245, 240, 230, 0.55); }
+      p.copy {
+        margin: 18px auto 0;
+        max-width: 320px;
+        font-size: 14px;
+        line-height: 1.7;
+        color: rgba(245, 240, 230, 0.55);
+      }
+      a {
+        display: inline-flex;
+        margin-top: 28px;
+        padding: 13px 24px;
+        border-radius: 999px;
+        background: #c8963e;
+        color: #0e0d0b;
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <svg class="mark" viewBox="0 0 512 512" aria-hidden="true">
+        <circle cx="256" cy="256" r="205" fill="none" stroke="#F5F0E6" stroke-opacity="0.3" stroke-width="7" />
+        <circle cx="256" cy="256" r="129" fill="none" stroke="#F5F0E6" stroke-opacity="0.62" stroke-width="5" stroke-dasharray="30 60" />
+        <circle cx="256" cy="256" r="50" fill="#C8963E" />
+      </svg>
+      <p class="eyebrow">ScentIQ</p>
+      <h1>You are offline.<br /><em>The catalogue is still here.</em></h1>
+      <p class="copy">
+        Pages you have already visited stay available. Personalised scoring needs a connection —
+        reconnect and we will pick up where you left off.
+      </p>
+      <a href="/">Try again</a>
+    </main>
+  </body>
+</html>

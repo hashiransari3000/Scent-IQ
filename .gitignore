@@ -1,0 +1,43 @@
+# Node
+node_modules/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+coverage/
+playwright-report/
+test-results/
+apps/web/.next/
+apps/web/node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.uv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Environment
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# Raw data is downloaded, not redistributed
+data/raw/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local QA artefacts (headless screenshots and scripts)
+.screens/
+
+# Editor
+.vscode/
+.idea/

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="ScentIQ">
+  <rect width="512" height="512" fill="#0E0D0B"/>
+  <circle cx="256" cy="256" r="205" fill="none" stroke="#F5F0E6" stroke-opacity="0.3" stroke-width="7"/>
+  <circle cx="256" cy="256" r="129" fill="none" stroke="#F5F0E6" stroke-opacity="0.62" stroke-width="5" stroke-dasharray="30 60"/>
+  <circle cx="256" cy="256" r="50" fill="#C8963E"/>
+</svg>

@@ -1,0 +1,124 @@
+{
+  "model": "DecisionTreeClassifier",
+  "k": 6,
+  "features": [
+    "note_overlap",
+    "avoid_conflict",
+    "family_cosine",
+    "cluster_affinity",
+    "price_fit",
+    "season_match",
+    "time_match",
+    "gender_match",
+    "popularity",
+    "concentration_score",
+    "cluster_0",
+    "cluster_1",
+    "cluster_2",
+    "cluster_3",
+    "cluster_4",
+    "cluster_5"
+  ],
+  "parameters": {
+    "max_depth": 6,
+    "min_samples_leaf": 40,
+    "class_weight": "balanced",
+    "test_size": 0.25
+  },
+  "rows": {
+    "total": 57600,
+    "train": 43200,
+    "test": 14400
+  },
+  "users": {
+    "total": 360,
+    "train": 270,
+    "test": 90,
+    "overlap": 0
+  },
+  "positive_rate": 0.3,
+  "classification": {
+    "accuracy": 0.6105,
+    "balanced_accuracy": 0.61,
+    "precision": 0.4016,
+    "recall": 0.6088,
+    "f1": 0.4839,
+    "roc_auc": 0.6481,
+    "confusion_matrix": [
+      [
+        6161,
+        3919
+      ],
+      [
+        1690,
+        2630
+      ]
+    ]
+  },
+  "ranking": {
+    "precision_at_10": 0.5255555555555556,
+    "recall_at_10": 0.10949074074074075,
+    "ndcg_at_10": 0.5319276545745646,
+    "lift_over_family_baseline": 1.303
+  },
+  "baseline_ranking": {
+    "precision_at_10": 0.4033333333333332,
+    "recall_at_10": 0.08402777777777778,
+    "ndcg_at_10": 0.4177799219914072
+  },
+  "tree": {
+    "depth": 6,
+    "leaves": 60,
+    "nodes": 119
+  },
+  "top_features": [
+    {
+      "feature": "season_match",
+      "importance": 0.40736
+    },
+    {
+      "feature": "family_cosine",
+      "importance": 0.20848
+    },
+    {
+      "feature": "popularity",
+      "importance": 0.19628
+    },
+    {
+      "feature": "price_fit",
+      "importance": 0.15056
+    },
+    {
+      "feature": "time_match",
+      "importance": 0.02564
+    },
+    {
+      "feature": "cluster_1",
+      "importance": 0.005
+    },
+    {
+      "feature": "cluster_3",
+      "importance": 0.00195
+    },
+    {
+      "feature": "concentration_score",
+      "importance": 0.00187
+    },
+    {
+      "feature": "cluster_0",
+      "importance": 0.0017
+    },
+    {
+      "feature": "cluster_2",
+      "importance": 0.00115
+    },
+    {
+      "feature": "note_overlap",
+      "importance": 0.0
+    },
+    {
+      "feature": "avoid_conflict",
+      "importance": 0.0
+    }
+  ]
+}

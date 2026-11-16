@@ -1,0 +1,713 @@
+{
+  "leaf": false,
+  "feature": "season_match",
+  "threshold": 0.83333,
+  "condition": "season_match <= 0.8333",
+  "samples": 43200,
+  "left": {
+    "leaf": false,
+    "feature": "popularity",
+    "threshold": 0.65452,
+    "condition": "popularity <= 0.6545",
+    "samples": 23187,
+    "left": {
+      "leaf": false,
+      "feature": "family_cosine",
+      "threshold": 0.09297,
+      "condition": "family_cosine <= 0.0930",
+      "samples": 19096,
+      "left": {
+        "leaf": false,
+        "feature": "price_fit",
+        "threshold": 0.85,
+        "condition": "price_fit <= 0.8500",
+        "samples": 5997,
+        "left": {
+          "leaf": false,
+          "feature": "season_match",
+          "threshold": 0.58333,
+          "condition": "season_match <= 0.5833",
+          "samples": 1614,
+          "left": {
+            "leaf": false,
+            "feature": "time_match",
+            "threshold": 0.75,
+            "condition": "time_match <= 0.7500",
+            "samples": 832,
+            "left": {
+              "leaf": true,
+              "samples": 211,
+              "enjoyment_probability": 0.0639
+            },
+            "right": {
+              "leaf": true,
+              "samples": 621,
+              "enjoyment_probability": 0.1384
+            }
+          },
+          "right": {
+            "leaf": false,
+            "feature": "price_fit",
+            "threshold": 0.55,
+            "condition": "price_fit <= 0.5500",
+            "samples": 782,
+            "left": {
+              "leaf": true,
+              "samples": 214,
+              "enjoyment_probability": 0.1404
+            },
+            "right": {
+              "leaf": true,
+              "samples": 568,
+              "enjoyment_probability": 0.2708
+            }
+          }
+        },
+        "right": {
+          "leaf": false,
+          "feature": "family_cosine",
+          "threshold": 0.0761,
+          "condition": "family_cosine <= 0.0761",
+          "samples": 4383,
+          "left": {
+            "leaf": false,
+            "feature": "time_match",
+            "threshold": 0.75,
+            "condition": "time_match <= 0.7500",
+            "samples": 2142,
+            "left": {
+              "leaf": true,
+              "samples": 623,
+              "enjoyment_probability": 0.1661
+            },
+            "right": {
+              "leaf": true,
+              "samples": 1519,
+              "enjoyment_probability": 0.2897
+            }
+          },
+          "right": {
+            "leaf": false,
+            "feature": "season_match",
+            "threshold": 0.41667,
+            "condition": "season_match <= 0.4167",
+            "samples": 2241,
+            "left": {
+              "leaf": true,
+              "samples": 47,
+              "enjoyment_probability": 0.0483
+            },
+            "right": {
+              "leaf": true,
+              "samples": 2194,
+              "enjoyment_probability": 0.3804
+            }
+          }
+        }
+      },
+      "right": {
+        "leaf": false,
+        "feature": "price_fit",
+        "threshold": 0.85,
+        "condition": "price_fit <= 0.8500",
+        "samples": 13099,
+        "left": {
+          "leaf": false,
+          "feature": "season_match",
+          "threshold": 0.58333,
+          "condition": "season_match <= 0.5833",
+          "samples": 3537,
+          "left": {
+            "leaf": false,
+            "feature": "price_fit",
+            "threshold": 0.55,
+            "condition": "price_fit <= 0.5500",
+            "samples": 1606,
+            "left": {
+              "leaf": true,
+              "samples": 536,
+              "enjoyment_probability": 0.1726
+            },
+            "right": {
+              "leaf": true,
+              "samples": 1070,
+              "enjoyment_probability": 0.3206
+            }
+          },
+          "right": {
+            "leaf": false,
+            "feature": "family_cosine",
+            "threshold": 0.13312,
+            "condition": "family_cosine <= 0.1331",
+            "samples": 1931,
+            "left": {
+              "leaf": true,
+              "samples": 1261,
+              "enjoyment_probability": 0.3266
+            },
+            "right": {
+              "leaf": true,
+              "samples": 670,
+              "enjoyment_probability": 0.4539
+            }
+          }
+        },
+        "right": {
+          "leaf": false,
+          "feature": "season_match",
+          "threshold": 0.58333,
+          "condition": "season_match <= 0.5833",
+          "samples": 9562,
+          "left": {
+            "leaf": false,
+            "feature": "time_match",
+            "threshold": 0.25,
+            "condition": "time_match <= 0.2500",
+            "samples": 3861,
+            "left": {
+              "leaf": true,
+              "samples": 337,
+              "enjoyment_probability": 0.1912
+            },
+            "right": {
+              "leaf": true,
+              "samples": 3524,
+              "enjoyment_probability": 0.4035
+            }
+          },
+          "right": {
+            "leaf": false,
+            "feature": "family_cosine",
+            "threshold": 0.1818,
+            "condition": "family_cosine <= 0.1818",
+            "samples": 5701,
+            "left": {
+              "leaf": true,
+              "samples": 5546,
+              "enjoyment_probability": 0.4811
+            },
+            "right": {
+              "leaf": true,
+              "samples": 155,
+              "enjoyment_probability": 0.7081
+            }
+          }
+        }
+      }
+    },
+    "right": {
+      "leaf": false,
+      "feature": "family_cosine",
+      "threshold": 0.08685,
+      "condition": "family_cosine <= 0.0869",
+      "samples": 4091,
+      "left": {
+        "leaf": false,
+        "feature": "season_match",
+        "threshold": 0.41667,
+        "condition": "season_match <= 0.4167",
+        "samples": 1077,
+        "left": {
+          "leaf": true,
+          "samples": 75,
+          "enjoyment_probability": 0.1429
+        },
+        "right": {
+          "leaf": false,
+          "feature": "cluster_1",
+          "threshold": 0.5,
+          "condition": "cluster_1 <= 0.5000",
+          "samples": 1002,
+          "left": {
+            "leaf": false,
+            "feature": "price_fit",
+            "threshold": 0.55,
+            "condition": "price_fit <= 0.5500",
+            "samples": 804,
+            "left": {
+              "leaf": true,
+              "samples": 92,
+              "enjoyment_probability": 0.2406
+            },
+            "right": {
+              "leaf": true,
+              "samples": 712,
+              "enjoyment_probability": 0.4054
+            }
+          },
+          "right": {
+            "leaf": false,
+            "feature": "family_cosine",
+            "threshold": 0.05512,
+            "condition": "family_cosine <= 0.0551",
+            "samples": 198,
+            "left": {
+              "leaf": true,
+              "samples": 41,
+              "enjoyment_probability": 0.3962
+            },
+            "right": {
+              "leaf": true,
+              "samples": 157,
+              "enjoyment_probability": 0.5361
+            }
+          }
+        }
+      },
+      "right": {
+        "leaf": false,
+        "feature": "season_match",
+        "threshold": 0.58333,
+        "condition": "season_match <= 0.5833",
+        "samples": 3014,
+        "left": {
+          "leaf": false,
+          "feature": "time_match",
+          "threshold": 0.75,
+          "condition": "time_match <= 0.7500",
+          "samples": 1225,
+          "left": {
+            "leaf": false,
+            "feature": "family_cosine",
+            "threshold": 0.1116,
+            "condition": "family_cosine <= 0.1116",
+            "samples": 331,
+            "left": {
+              "leaf": true,
+              "samples": 113,
+              "enjoyment_probability": 0.2327
+            },
+            "right": {
+              "leaf": true,
+              "samples": 218,
+              "enjoyment_probability": 0.4582
+            }
+          },
+          "right": {
+            "leaf": false,
+            "feature": "family_cosine",
+            "threshold": 0.11881,
+            "condition": "family_cosine <= 0.1188",
+            "samples": 894,
+            "left": {
+              "leaf": true,
+              "samples": 481,
+              "enjoyment_probability": 0.4943
+            },
+            "right": {
+              "leaf": true,
+              "samples": 413,
+              "enjoyment_probability": 0.6341
+            }
+          }
+        },
+        "right": {
+          "leaf": false,
+          "feature": "popularity",
+          "threshold": 0.82873,
+          "condition": "popularity <= 0.8287",
+          "samples": 1789,
+          "left": {
+            "leaf": false,
+            "feature": "price_fit",
+            "threshold": 0.55,
+            "condition": "price_fit <= 0.5500",
+            "samples": 858,
+            "left": {
+              "leaf": true,
+              "samples": 50,
+              "enjoyment_probability": 0.3684
+            },
+            "right": {
+              "leaf": true,
+              "samples": 808,
+              "enjoyment_probability": 0.6023
+            }
+          },
+          "right": {
+            "leaf": false,
+            "feature": "price_fit",
+            "threshold": 0.85,
+            "condition": "price_fit <= 0.8500",
+            "samples": 931,
+            "left": {
+              "leaf": true,
+              "samples": 333,
+              "enjoyment_probability": 0.5991
+            },
+            "right": {
+              "leaf": true,
+              "samples": 598,
+              "enjoyment_probability": 0.7152
+            }
+          }
+        }
+      }
+    }
+  },
+  "right": {
+    "leaf": false,
+    "feature": "popularity",
+    "threshold": 0.57328,
+    "condition": "popularity <= 0.5733",
+    "samples": 20013,
+    "left": {
+      "leaf": false,
+      "feature": "price_fit",
+      "threshold": 0.55,
+      "condition": "price_fit <= 0.5500",
+      "samples": 15841,
+      "left": {
+        "leaf": false,
+        "feature": "family_cosine",
+        "threshold": 0.15125,
+        "condition": "family_cosine <= 0.1512",
+        "samples": 1581,
+        "left": {
+          "leaf": false,
+          "feature": "price_fit",
+          "threshold": 0.25,
+          "condition": "price_fit <= 0.2500",
+          "samples": 1403,
+          "left": {
+            "leaf": false,
+            "feature": "cluster_3",
+            "threshold": 0.5,
+            "condition": "cluster_3 <= 0.5000",
+            "samples": 275,
+            "left": {
+              "leaf": true,
+              "samples": 225,
+              "enjoyment_probability": 0.2018
+            },
+            "right": {
+              "leaf": true,
+              "samples": 50,
+              "enjoyment_probability": 0.4242
+            }
+          },
+          "right": {
+            "leaf": false,
+            "feature": "family_cosine",
+            "threshold": 0.06529,
+            "condition": "family_cosine <= 0.0653",
+            "samples": 1128,
+            "left": {
+              "leaf": true,
+              "samples": 68,
+              "enjoyment_probability": 0.1842
+            },
+            "right": {
+              "leaf": true,
+              "samples": 1060,
+              "enjoyment_probability": 0.398
+            }
+          }
+        },
+        "right": {
+          "leaf": false,
+          "feature": "family_cosine",
+          "threshold": 0.16832,
+          "condition": "family_cosine <= 0.1683",
+          "samples": 178,
+          "left": {
+            "leaf": false,
+            "feature": "family_cosine",
+            "threshold": 0.15628,
+            "condition": "family_cosine <= 0.1563",
+            "samples": 93,
+            "left": {
+              "leaf": true,
+              "samples": 44,
+              "enjoyment_probability": 0.5469
+            },
+            "right": {
+              "leaf": true,
+              "samples": 49,
+              "enjoyment_probability": 0.7085
+            }
+          },
+          "right": {
+            "leaf": false,
+            "feature": "family_cosine",
+            "threshold": 0.18669,
+            "condition": "family_cosine <= 0.1867",
+            "samples": 85,
+            "left": {
+              "leaf": true,
+              "samples": 45,
+              "enjoyment_probability": 0.2642
+            },
+            "right": {
+              "leaf": true,
+              "samples": 40,
+              "enjoyment_probability": 0.633
+            }
+          }
+        }
+      },
+      "right": {
+        "leaf": false,
+        "feature": "family_cosine",
+        "threshold": 0.0907,
+        "condition": "family_cosine <= 0.0907",
+        "samples": 14260,
+        "left": {
+          "leaf": false,
+          "feature": "family_cosine",
+          "threshold": 0.06404,
+          "condition": "family_cosine <= 0.0640",
+          "samples": 3059,
+          "left": {
+            "leaf": false,
+            "feature": "price_fit",
+            "threshold": 0.85,
+            "condition": "price_fit <= 0.8500",
+            "samples": 661,
+            "left": {
+              "leaf": true,
+              "samples": 129,
+              "enjoyment_probability": 0.2615
+            },
+            "right": {
+              "leaf": true,
+              "samples": 532,
+              "enjoyment_probability": 0.435
+            }
+          },
+          "right": {
+            "leaf": false,
+            "feature": "family_cosine",
+            "threshold": 0.0905,
+            "condition": "family_cosine <= 0.0905",
+            "samples": 2398,
+            "left": {
+              "leaf": true,
+              "samples": 2354,
+              "enjoyment_probability": 0.5242
+            },
+            "right": {
+              "leaf": true,
+              "samples": 44,
+              "enjoyment_probability": 0.2692
+            }
+          }
+        },
+        "right": {
+          "leaf": false,
+          "feature": "price_fit",
+          "threshold": 0.85,
+          "condition": "price_fit <= 0.8500",
+          "samples": 11201,
+          "left": {
+            "leaf": false,
+            "feature": "family_cosine",
+            "threshold": 0.12647,
+            "condition": "family_cosine <= 0.1265",
+            "samples": 2324,
+            "left": {
+              "leaf": true,
+              "samples": 1422,
+              "enjoyment_probability": 0.4928
+            },
+            "right": {
+              "leaf": true,
+              "samples": 902,
+              "enjoyment_probability": 0.5876
+            }
+          },
+          "right": {
+            "leaf": false,
+            "feature": "popularity",
+            "threshold": 0.20561,
+            "condition": "popularity <= 0.2056",
+            "samples": 8877,
+            "left": {
+              "leaf": true,
+              "samples": 612,
+              "enjoyment_probability": 0.4969
+            },
+            "right": {
+              "leaf": true,
+              "samples": 8265,
+              "enjoyment_probability": 0.6155
+            }
+          }
+        }
+      }
+    },
+    "right": {
+      "leaf": false,
+      "feature": "price_fit",
+      "threshold": 0.85,
+      "condition": "price_fit <= 0.8500",
+      "samples": 4172,
+      "left": {
+        "leaf": false,
+        "feature": "family_cosine",
+        "threshold": 0.09603,
+        "condition": "family_cosine <= 0.0960",
+        "samples": 1527,
+        "left": {
+          "leaf": false,
+          "feature": "cluster_1",
+          "threshold": 0.5,
+          "condition": "cluster_1 <= 0.5000",
+          "samples": 408,
+          "left": {
+            "leaf": false,
+            "feature": "popularity",
+            "threshold": 0.80109,
+            "condition": "popularity <= 0.8011",
+            "samples": 330,
+            "left": {
+              "leaf": true,
+              "samples": 167,
+              "enjoyment_probability": 0.4155
+            },
+            "right": {
+              "leaf": true,
+              "samples": 163,
+              "enjoyment_probability": 0.5222
+            }
+          },
+          "right": {
+            "leaf": true,
+            "samples": 78,
+            "enjoyment_probability": 0.6311
+          }
+        },
+        "right": {
+          "leaf": false,
+          "feature": "popularity",
+          "threshold": 0.77471,
+          "condition": "popularity <= 0.7747",
+          "samples": 1119,
+          "left": {
+            "leaf": false,
+            "feature": "concentration_score",
+            "threshold": 0.95,
+            "condition": "concentration_score <= 0.9500",
+            "samples": 532,
+            "left": {
+              "leaf": true,
+              "samples": 483,
+              "enjoyment_probability": 0.5937
+            },
+            "right": {
+              "leaf": true,
+              "samples": 49,
+              "enjoyment_probability": 0.7719
+            }
+          },
+          "right": {
+            "leaf": false,
+            "feature": "family_cosine",
+            "threshold": 0.12632,
+            "condition": "family_cosine <= 0.1263",
+            "samples": 587,
+            "left": {
+              "leaf": true,
+              "samples": 345,
+              "enjoyment_probability": 0.6556
+            },
+            "right": {
+              "leaf": true,
+              "samples": 242,
+              "enjoyment_probability": 0.7742
+            }
+          }
+        }
+      },
+      "right": {
+        "leaf": false,
+        "feature": "popularity",
+        "threshold": 0.81533,
+        "condition": "popularity <= 0.8153",
+        "samples": 2645,
+        "left": {
+          "leaf": false,
+          "feature": "family_cosine",
+          "threshold": 0.09463,
+          "condition": "family_cosine <= 0.0946",
+          "samples": 1618,
+          "left": {
+            "leaf": false,
+            "feature": "popularity",
+            "threshold": 0.61181,
+            "condition": "popularity <= 0.6118",
+            "samples": 405,
+            "left": {
+              "leaf": true,
+              "samples": 76,
+              "enjoyment_probability": 0.5335
+            },
+            "right": {
+              "leaf": true,
+              "samples": 329,
+              "enjoyment_probability": 0.6505
+            }
+          },
+          "right": {
+            "leaf": false,
+            "feature": "cluster_0",
+            "threshold": 0.5,
+            "condition": "cluster_0 <= 0.5000",
+            "samples": 1213,
+            "left": {
+              "leaf": true,
+              "samples": 1160,
+              "enjoyment_probability": 0.7199
+            },
+            "right": {
+              "leaf": true,
+              "samples": 53,
+              "enjoyment_probability": 0.5455
+            }
+          }
+        },
+        "right": {
+          "leaf": false,
+          "feature": "family_cosine",
+          "threshold": 0.08785,
+          "condition": "family_cosine <= 0.0878",
+          "samples": 1027,
+          "left": {
+            "leaf": false,
+            "feature": "cluster_1",
+            "threshold": 0.5,
+            "condition": "cluster_1 <= 0.5000",
+            "samples": 191,
+            "left": {
+              "leaf": true,
+              "samples": 149,
+              "enjoyment_probability": 0.7248
+            },
+            "right": {
+              "leaf": true,
+              "samples": 42,
+              "enjoyment_probability": 0.5895
+            }
+          },
+          "right": {
+            "leaf": false,
+            "feature": "cluster_2",
+            "threshold": 0.5,
+            "condition": "cluster_2 <= 0.5000",
+            "samples": 836,
+            "left": {
+              "leaf": true,
+              "samples": 603,
+              "enjoyment_probability": 0.7696
+            },
+            "right": {
+              "leaf": true,
+              "samples": 233,
+              "enjoyment_probability": 0.8392
+            }
+          }
+        }
+      }
+    }
+  }
+}

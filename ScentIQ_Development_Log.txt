@@ -1,0 +1,1018 @@
+================================================================================
+SCENTIQ - MASTER DEVELOPMENT LOG AND BUILD PLAN
+================================================================================
+Project      : ScentIQ - Intelligent Personalized Fragrance Recommendation
+Owner        : Hashir
+Started      : 2026-11-16
+Status       : v1 code complete and QA-verified (Phases 0-10); deployment
+               config ready - live hosting pending account authorization
+Repo         : https://github.com/hashiransari3000/Scent-IQ
+Production   : TBD (free Vercel + Render URLs; see docs/DEPLOYMENT.md)
+Budget       : $0.00 (hard constraint)
+Log rule     : This file is the single source of truth. Append every work session.
+
+--------------------------------------------------------------------------------
+0. HOW THIS LOG IS MAINTAINED
+--------------------------------------------------------------------------------
+Every session appends an entry to section 17 (PROGRESS LOG) with:
+  date/time | phase | action | files changed | commands | result | issues | next
+
+Rules:
+  - Never write passwords, API keys, service-role keys, or tokens in this file.
+    Use placeholders such as <SUPABASE_SERVICE_ROLE_KEY>.
+  - Every architectural decision goes in section 18 (DECISION LOG) with a reason.
+  - Every phase has explicit acceptance criteria. A phase is not "done" until
+    they pass.
+  - This log is part of the portfolio: it shows process, not just output.
+
+--------------------------------------------------------------------------------
+1. VISION AND SUCCESS CRITERIA
+--------------------------------------------------------------------------------
+Vision:
+  A real, usable fragrance discovery product - not a Streamlit demo. It should
+  feel like a modern Fragrantica: rich perfume pages, notes, families, seasons,
+  community feedback, similar scents, and a personalized recommendation engine
+  that explains itself.
+
+Portfolio goals:
+  - Public URL that works on Android and desktop.
+  - Clean monorepo, typed frontend, tested backend, CI/CD, monitoring.
+  - Visible ML engineering: clustering, classification, simulation, evaluation,
+    a feedback-to-retraining loop, and honest limitations.
+  - A case study and demo video that can be shown to employers.
+
+Academic goals:
+  - Demonstrate K-Means clustering of perfumes by scent characteristics.
+  - Demonstrate a Decision Tree classifier predicting user enjoyment using
+    cluster information and user preferences.
+  - Show evaluation, explainability, and a critical discussion of limitations.
+
+Definition of Done for v1:
+  [ ] Public production URL, mobile-installable PWA, responsive on 360px-1440px+
+      -> PWA + responsive verified at 390px and 1440px; URL pending credentials.
+  [~] Auth (email/password or magic link) + anonymous guest mode
+      -> anonymous browser profile shipped; accounts deferred to Phase 5.
+  [x] Onboarding: loved perfumes, loved/avoided notes, budget, season, occasion
+  [x] Catalogue with search, filters, sorting, detail pages
+  [x] Personalized Discover feed with match score and "why this" explanation
+  [x] Like/dislike feedback that visibly changes recommendations
+  [~] Profile: taste radar, cluster map, history, saved collections
+      -> profile, wardrobe, preferences and completion shipped; scent map lives
+         on Discover; history/collections deferred.
+  [ ] Community ratings/reviews (original content, not scraped) - deferred.
+  [x] Similar-perfume recommendations
+  [~] CI/CD: tests + deploy on push; migrations; keepalive; rollback documented
+      -> CI, Blueprint, Vercel guide and keepalive ready; first live deploy
+         pending account access. No SQL migrations in v1 (stateless design).
+  [ ] Error monitoring, uptime monitoring, analytics
+      -> Sentry API hook + external-monitor instructions prepared; keys pending.
+  [~] Report, README, model card, demo script
+      -> README with architecture/metrics/screenshots done; academic report,
+         model card and demo script still to produce.
+
+V1 SHIPPED SCOPE (verified 2026-11-16):
+  - 1,478 perfumes / 160 houses / 420 notes / 14 families / 6 learned clusters.
+  - Static perfume pages for the 100 most popular + partial prerender for all.
+  - Hybrid API with on-device fallback, explanations, MMR diversity.
+  - PWA manifest, service worker, offline page, generated icons, SEO routes.
+  - CI (web lint/types/build + ML tests + API tests), Render Blueprint,
+    keepalive workflow, security headers, deployment runbook.
+  - Desktop + 390px visual QA, end-to-end onboarding, feedback persistence,
+    catalogue deep links, mobile menu, zero console/network errors.
+
+--------------------------------------------------------------------------------
+2. HARD CONSTRAINTS
+--------------------------------------------------------------------------------
+1. $0 budget. Free tiers only. No paid domains, APIs, databases, or stores.
+2. No Google Play / App Store listing ($25/$99). Use an installable PWA.
+3. No licensed perfume bottle photography. Use generated/abstract art and CSS.
+4. No copying Fragrantica reviews, images, or proprietary text. Use licensed
+   Scento descriptions with attribution, plus our own community content.
+5. Free tiers sleep or pause. Design for cold starts and keep them warm.
+6. Solo project. Scope must stay maintainable.
+7. "No bugs" is not a guarantee anyone can make. We will use quality gates:
+   types, tests, CI, staging, monitoring, and a fast fix process.
+
+--------------------------------------------------------------------------------
+3. FINAL STACK DECISION
+--------------------------------------------------------------------------------
+FRONTEND (web + Android + desktop via PWA)
+  Next.js 15 (App Router) + TypeScript
+  Tailwind CSS v4 + shadcn/ui primitives
+  Framer Motion for animation
+  Lucide icons
+  next/font (Fraunces display + Geist/Inter body)
+  Serwist service worker (PWA, offline catalogue cache)
+  Deployed free on Vercel Hobby
+
+BACKEND / ML SERVICE
+  FastAPI + Python 3.12 + Pydantic v2 + Uvicorn
+  scikit-learn (KMeans, DecisionTreeClassifier), numpy, joblib
+  pandas only offline (training/data pipeline), not at API runtime
+  slowapi rate limiting, gzip, strict CORS
+  Docker image deployed free on Render (512 MB) with keepalive
+  Fallback host if Render is unreliable: Hugging Face Spaces (Docker, free CPU)
+
+DATABASE / AUTH / STORAGE
+  Supabase Free: Postgres, Auth, Row Level Security, Storage, pgvector
+  System of record for catalogue, clusters, users, feedback, collections,
+  reviews. Catalogue remains browsable even if the ML API is asleep.
+
+ML OFFLINE PIPELINE
+  Python scripts + Jupyter notebooks
+  TF-IDF -> TruncatedSVD -> normalized vectors -> KMeans
+  Synthetic-user simulation -> pair features -> DecisionTree
+  Artifacts: kmeans.joblib, tree.joblib, tree_rules.json, vectors.npz,
+  perfume_index.parquet, feature_meta.json, metrics.json
+
+CI/CD + OPS
+  GitHub public repo (free unlimited Actions minutes)
+  GitHub Actions: ci.yml, db-migrate.yml, keepalive.yml, retrain.yml
+  Vercel and Render auto-deploy from main
+  Sentry Free (errors), UptimeRobot Free (uptime), Vercel Analytics
+  Supabase CLI migrations
+
+WHY NOT STREAMLIT FOR PRODUCTION
+  Streamlit is excellent for the academic model demo, but it cannot deliver the
+  animated, mobile-first, Fragrantica-depth experience requested. We keep Python
+  and scikit-learn as the ML core and serve it through FastAPI. If the university
+  explicitly requires a Streamlit interface, we add a separate "Model Lab"
+  Streamlit app (free on HF Spaces) that shows clusters, tree, and metrics.
+
+WHY PWA INSTEAD OF NATIVE ANDROID
+  One codebase, $0, installable from Chrome on Android and Edge/Chrome on PC,
+  offline catalogue, no store fees or review delays. A native wrapper (Capacitor)
+  can be added later without rewriting the UI.
+
+--------------------------------------------------------------------------------
+4. ARCHITECTURE
+--------------------------------------------------------------------------------
+High-level:
+
+  Browser / Android PWA
+    |-- Supabase JS (anon key + RLS): auth, catalogue reads, search, feedback,
+    |   reviews, collections, similar perfumes via pgvector RPC
+    |-- FastAPI: POST /v1/recommend, /v1/explain, /v1/model/info
+    |
+  Supabase Postgres (system of record)
+    |-- perfumes, perfume_vectors, clusters, reviews, profiles,
+        user_preferences, feedback, collections, collection_items
+    |
+  FastAPI (stateless ML service)
+    |-- loads model artifacts at startup
+    |-- receives profile inputs (IDs, notes, filters), returns ranking + reasons
+    |-- no user PII required
+    |
+  GitHub Actions
+    |-- CI on PR, migrations on merge, keepalive cron, manual retrain
+
+Key reliability decision:
+  Catalogue, detail pages, search, reviews, and similar perfumes work directly
+  from Supabase and do NOT depend on the ML API. If Render is cold, the site is
+  still fully usable; only the Discover ranking shows a "warming engine" state.
+
+Data flow - recommendation:
+  User profile (loved IDs + notes + filters)
+    -> FastAPI builds user vector / cluster affinity
+    -> candidate filtering (budget, season, occasion, gender, exclude rated)
+    -> hybrid score: content similarity + tree probability + cluster affinity
+       + quality prior
+    -> MMR diversity rerank
+    -> top N with explanation text and confidence
+
+Data flow - feedback and learning:
+  Like/dislike/review in UI
+    -> Supabase (RLS-protected)
+    -> profile affinity updates immediately in the client
+    -> manual/periodic retrain workflow pulls feedback, retrains tree,
+       validates metrics, commits artifacts, redeploys API
+  This is the honest ML loop: simulated labels for cold start, real labels over
+  time.
+
+--------------------------------------------------------------------------------
+5. DATA STRATEGY
+--------------------------------------------------------------------------------
+PRIMARY DATASET: Scento Perfume Database (Hugging Face)
+  URL     : https://huggingface.co/datasets/scento/perfume-database
+  License : CC BY 4.0 - attribution required in the app and README
+  Size    : 1,479 perfumes, 160 houses, 420 raw materials
+  Fields  : id, name, house, year, perfumers, concentration, family,
+            secondary_family, character, seasons, times_of_day, top_notes,
+            heart_notes, base_notes, notes (flat), description,
+            popularity_rank, url
+  Gaps    : no prices, no community ratings, no longevity/sillage, no images
+  Why     : clean, licensed, and it has the season/time metadata the brief needs
+
+OPTIONAL SECONDARY: Kaggle Fragrantica datasets
+  https://www.kaggle.com/datasets/ledecanteur/fragrantica-perfumes
+  https://www.kaggle.com/datasets/olgagmiufana1/fragrantica-com-fragrance-dataset
+  Use for scale/community ratings only if time allows. Scraped provenance and
+  license must be checked. Do not redistribute raw data publicly.
+  Decision for v1: Scento only. Cleaner, safer, faster, and 1,479 perfumes is
+  plenty for K-Means, a tree, and a polished product.
+
+PRICE TIER (estimated, never pretend it is exact)
+  Tier 1 "Accessible"  : Arabian houses, drugstore/designer diffusion
+  Tier 2 "Designer"    : mainstream designer brands
+  Tier 3 "Premium"     : premium designer / entry niche
+  Tier 4 "Luxury"      : niche, heritage, high-end houses
+  Build brand_price_tier.csv for the top ~120 houses, fall back to house type.
+  UI label: "Estimated retail tier" with tooltip explaining the estimate.
+
+RATINGS / LONGEVITY / SILLAGE
+  Do not fabricate. Start empty and collect real community votes:
+    reviews(rating 1-5, longevity 1-5, sillage 1-5, text)
+    perfume_stats view aggregates count + average.
+  Until then show "New - be the first to rate" or popularity rank.
+  If Kaggle ratings are merged later, label the source and date.
+
+IMAGES / VISUALS
+  No scraped brand photos. Generate 10-14 abstract "scent family" visuals with
+  ImageGen (citrus, floral, oud, gourmand, aquatic, woody, musk, spicy, green,
+  fruity, amber, leather). Map each perfume to a family visual + deterministic
+  CSS gradient derived from its ID, so every card looks unique without 1,479
+  image assets.
+
+CLEANING RULES
+  - Scento CSVs are pipe-delimited; list fields use semicolons.
+  - Lowercase notes, trim, map aliases and synonyms, merge singular/plural.
+  - Drop notes appearing in fewer than 5 perfumes from the model features,
+    keep them in display data.
+  - Deduplicate by normalized (name, house, year).
+  - Parse seasons/times_of_day into arrays; validate allowed values.
+  - Handle missing year/concentration with "Unknown" + missing indicator.
+  - Use a schema validator (pandera or custom) and fail loudly.
+  - Keep raw data immutable in data/raw; write data/processed as parquet.
+  - Attribution block in About page and README.
+
+DATA MODEL (Supabase)
+  profiles(id uuid PK -> auth.users, display_name, avatar_url, onboarded,
+           created_at)
+  user_preferences(user_id PK, loved_perfume_ids text[], love_notes text[],
+           avoid_notes text[], budget_tier int, seasons text[], occasions
+           text[], gender text, updated_at)
+  perfumes(id text PK, name, house, year, concentration, family,
+           secondary_family, character, gender, seasons text[],
+           times_of_day text[], top_notes text[], heart_notes text[],
+           base_notes text[], notes text[], description, popularity_rank,
+           price_tier int, image_key text, vector vector(48), cluster_id int)
+  clusters(id int PK, name, description, top_notes text[], color, centroid
+           vector(48), size int)
+  feedback(id uuid PK, user_id, perfume_id, action text check in
+           ('like','dislike','neutral'), created_at, unique(user_id, perfume_id))
+  collections(id uuid PK, user_id, name, is_public bool, created_at)
+  collection_items(collection_id, perfume_id, added_at, PK(collection_id,
+           perfume_id))
+  reviews(id uuid PK, user_id, perfume_id, rating int 1-5, longevity int,
+           sillage int, body text, created_at, unique(user_id, perfume_id))
+  Indexes: perfume name trigram, GIN on notes/seasons, ivfflat on vector,
+           feedback(user_id), reviews(perfume_id).
+  RLS: public read on perfumes/clusters/reviews (limited profile fields);
+       users write only their own rows (auth.uid() = user_id).
+
+--------------------------------------------------------------------------------
+6. MACHINE LEARNING DESIGN
+--------------------------------------------------------------------------------
+6.1 PERFUME FEATURES
+  - Note families: citrus, floral, woody, amber/oriental, gourmand, spicy,
+    aromatic, musky, fruity, green, aquatic, leather, animalic, powdery.
+  - Top ~120 individual notes (frequency >= 5), multi-hot.
+  - Accords/families: family + secondary_family one-hot; derived accord strength
+    from note-family counts.
+  - Context: season multi-hot, time-of-day multi-hot, gender, concentration,
+    decade, price tier.
+  - Quality: popularity rank (normalized); Bayesian community rating later.
+  Pipeline: TF-IDF on note-family/accord tokens -> TruncatedSVD (30-50 comps)
+  -> L2 normalize. Context/quality features are scaled separately and appended
+  for the tree, not forced into the clustering vector.
+  Never cluster directly on 2,600 sparse raw notes.
+
+6.2 K-MEANS
+  - Try k = 6..14. Score with silhouette (sample), Davies-Bouldin, and human
+    inspection of top notes/accords per cluster.
+  - Fixed random_state=42, n_init=20. Save centroids and labels.
+  - Name clusters from over-represented notes ("Oud, Amber & Spice",
+    "Fresh Citrus & Aquatic", "Vanilla & Gourmand", etc.).
+  - Write a cluster description for the UI; never show "Cluster 7".
+  - 2-D map via PCA (deterministic) for the profile page; optionally UMAP
+    offline if it improves separation, but do not add a heavy runtime dependency.
+
+6.3 DECISION TREE - THE CRITICAL PART
+  There are no individual user ratings in public datasets. Training "will this
+  user like it?" requires labels. Two-stage solution:
+
+  Stage A - cold start with simulated users
+    - Define 8-12 latent archetypes with hidden preference vectors over note
+      families/accords and context preferences.
+    - Generate 200-400 users per archetype with noise and varied filters.
+    - For each user, sample 100-200 candidate perfumes, compute hidden affinity,
+      label top ~30% as liked. Keep realistic imbalance (~65/35 or 70/30).
+    - Observable pair features ONLY:
+        note_overlap, avoid_note_conflict, family_match, cluster_affinity,
+        price_fit, season_match, occasion_match, gender_match,
+        popularity_prior, concentration_match, community_rating (when real)
+    - Train DecisionTreeClassifier(max_depth 5-6, min_samples_leaf 30-50,
+      class_weight='balanced', random_state=42).
+    - Split by USER with GroupShuffleSplit, never by row.
+    - LEAKAGE GUARDRAIL: labels must come from the hidden user vector, not from
+      the observable features. Add a test that proves users do not overlap
+      between train and test. If accuracy is ~99%, assume leakage and audit.
+    - Export tree_rules.json for explanations and a later TypeScript fallback.
+
+  Stage B - real feedback
+    - Persist every like/dislike/review.
+    - Update the user vector immediately: v_user += alpha * v_perfume for likes,
+      v_user -= beta * v_perfume for dislikes (alpha ~0.2, beta ~0.15), normalize.
+    - Recompute cluster affinity from the user's liked perfumes.
+    - Manual/periodic retrain once >= 200-500 real interactions exist. Compare
+      simulated vs real metrics and report both.
+    - Active learning idea (stretch): surface items with tree probability near
+      0.5 to collect the most informative feedback.
+
+6.4 HYBRID RANKING
+  score = 0.40 * content_cosine
+        + 0.30 * tree_probability
+        + 0.20 * cluster_affinity
+        + 0.10 * quality_prior
+  Hard filters first: budget tier, seasons, occasion, gender, exclude already
+  rated/liked perfumes (unless "show more like this").
+  Then MMR diversity rerank (lambda ~0.7) so the list is not ten oud scents.
+  Unknown user: content-only + popularity, labeled "Starter picks".
+
+6.5 EXPLANATIONS
+  Generate from tree path + feature contributions, deterministic templates:
+    "You lean woody-amber. This sits in Oud, Amber & Spice, shares 4 of your 6
+     favourite notes (oud, amber, saffron, cedar), fits winter/evening, and is
+     within your Designer tier."
+  Always show conflicts:
+    "Heads up: it contains rose, which you asked to avoid."
+  Show a confidence band, not a fake precise percentage. No LLM needed; the
+  deterministic explanation is defensible and cannot hallucinate notes.
+
+6.6 EVALUATION
+  Clustering : silhouette, Davies-Bouldin, cluster top-note sanity, size balance.
+  Tree       : balanced accuracy, precision/recall/F1, ROC-AUC, per-user
+               precision@10, confusion matrix; report simulation caveat.
+  Ranking    : hit rate@10 on held-out liked perfumes, intra-list diversity,
+               catalogue coverage, novelty.
+  Real test  : 5-10 people x 20 ratings; compare predicted vs actual; report
+               honestly. This is the strongest evidence in the viva.
+  Targets (not guarantees): silhouette > 0.10, balanced accuracy > 0.75,
+  simulated hit@10 > 0.60, warm recommendation p95 < 300 ms.
+
+6.7 MODEL CARD / LIMITATIONS
+  Document data source and date, feature definitions, simulated-label method,
+  known biases (popularity, Western/designer skew, missing prices), evaluation
+  caveats, privacy (no PII sent to the ML API), and intended use (discovery,
+  not medical/allergy advice). Allergy warning in the UI: notes are descriptive,
+  not a safety guarantee.
+
+--------------------------------------------------------------------------------
+7. UX AND DESIGN SYSTEM
+--------------------------------------------------------------------------------
+Direction: "quiet luxury, data-driven" - warm, editorial, tactile. Avoid generic
+purple SaaS gradients.
+
+Palette:
+  Ink        #0E0D0B  (background)
+  Ivory      #F5F0E6  (text / light surfaces)
+  Amber      #C8963E  (primary accent)
+  Rose       #B86B77  (floral accent)
+  Moss       #6B7A5A  (green accent)
+  Oud        #5A3E2B  (warm brown)
+  Glass      rgba(245,240,230,0.06) + 1px border rgba(245,240,230,0.12)
+
+Typography:
+  Display: Fraunces (or Cormorant Garamond) for headlines, 400-600
+  Body: Geist or Inter, 400-500
+  Sizes: fluid clamp() scale; 16px base minimum; generous line height.
+
+Motion:
+  Framer Motion. 150-400 ms, ease-out. Staggered reveals, page fades, card lift,
+  number count-up, note-pyramid reveal, match gauge sweep, cluster-map pulse.
+  Respect prefers-reduced-motion. No motion that blocks reading. Target 60 fps
+  on mid-range Android; transform/opacity only for animations.
+
+Layout:
+  Desktop: 12-column, max-width 1280, sticky header, side filters on catalogue.
+  Mobile: bottom tab bar (Discover, Search, Saved, Profile), safe-area padding,
+  swipeable recommendation cards, filters in a sheet.
+  Touch targets >= 44px. No hover-only actions.
+
+Core pages:
+  1. Home / Landing: hero, live note cloud, how it works, family gallery,
+     featured perfumes, CTA, attribution.
+  2. Onboarding: 4 steps (loved perfumes -> love/avoid notes -> budget/season/
+     occasion -> gender), progress, skip, animated transitions.
+  3. Discover: personalized feed, match ring, family chip, why-this panel,
+     like/dislike/save, "surprise me", empty/cold-start states.
+  4. Catalogue: search, filter by house/family/note/season/time/price tier/
+     gender/rating, sort, pagination/infinite scroll, URL-synced filters.
+  5. Perfume detail: family visual, name/house/year/concentration, note pyramid
+     (top/heart/base), family/accord bars, season/time ribbon, price tier,
+     community rating + review form, similar perfumes, add to collection,
+     like/dislike, attribution.
+  6. Profile: taste radar, cluster map with "you are here", feedback timeline,
+     collections, stats, edit preferences, sign out.
+  7. Auth: sign in, sign up, magic link, guest mode.
+  8. About / Methodology: data sources and license, how the models work, model
+     card, limitations, allergy disclaimer.
+  9. Model Lab (optional, portfolio/viva): cluster summaries, tree visualization,
+     feature importance, metrics, evaluation caveats.
+  10. 404 / offline / error states.
+
+Component library:
+  Button, IconButton, Chip, NoteChip, PerfumeCard, MatchRing, Gauge, NotePyramid,
+  AccordBar, SeasonRibbon, RatingStars, ReviewCard, Skeleton, Toast, Modal/Sheet,
+  Tabs, EmptyState, ErrorState, InstallPrompt, UserMenu.
+
+PWA:
+  manifest (name, icons, theme color, display standalone), service worker,
+  offline shell + cached catalogue, install prompt on Android/desktop.
+  App icons generated, no paid assets.
+
+Accessibility:
+  WCAG AA contrast, visible focus, keyboard navigation, aria labels, semantic
+  headings, reduced motion, screen-reader labels for charts (data table fallback),
+  form errors announced.
+
+Performance budgets:
+  LCP < 2.5 s on 4G, CLS < 0.1, initial JS < 200 KB gzipped for core pages,
+  route-level code splitting, optimized fonts, lazy charts, image placeholders.
+
+--------------------------------------------------------------------------------
+8. PHASED BUILD PLAN
+--------------------------------------------------------------------------------
+Timeline assumption: ~5-6 weeks full-time, 8-10 weeks part-time. Each phase has
+a gate; do not start the next phase until the gate passes.
+
+PHASE 0 - FOUNDATIONS AND ACCESS (0.5-1 day)
+  Tasks:
+  [ ] Confirm the user's workflow diagram (not received yet; see section 16).
+  [ ] Install Python 3.12 (winget or python.org), verify pip.
+  [ ] Install uv for fast, reproducible Python envs.
+  [ ] Create public GitHub repo "scentiq", clone into workspace, protect main.
+  [ ] Create free accounts: Vercel, Render, Supabase, Sentry, UptimeRobot.
+  [ ] Create Supabase project, choose closest region, save keys locally.
+  [ ] Create .env.example and local .env files (never commit secrets).
+  [ ] Record free-tier limits in section 9.
+  Deliverable: toolchain + repo + accounts + env.
+  Gate: python 3.12 works, git remote exists, /health hello deploys nowhere yet,
+        all accounts active and keys stored safely.
+
+PHASE 1 - REPO SKELETON, CI, HELLO DEPLOY (1-2 days)
+  Tasks:
+  [ ] Monorepo structure (apps/web, services/api, ml, supabase, docs, scripts).
+  [ ] Scaffold Next.js + TS + Tailwind + shadcn + Framer Motion.
+  [ ] Scaffold FastAPI + /health + pytest + ruff + Dockerfile.
+  [ ] Supabase CLI init + first migration (profiles).
+  [ ] GitHub Actions ci.yml: web lint/typecheck/build; api lint/test.
+  [ ] Deploy hello world to Vercel and Render; verify CORS and env vars.
+  [ ] Add README skeleton and this log to the repo.
+  Gate: CI green on PR; public hello URLs; /health returns 200; no secrets in git.
+
+PHASE 2 - DATA PIPELINE AND EDA (2-3 days)
+  Tasks:
+  [ ] Download Scento raw files (HF CLI or direct URLs).
+  [ ] Audit: row counts, missing, duplicates, note frequency, season coverage.
+  [ ] Build cleaning + alias mapping + price tier mapping.
+  [ ] Export perfumes.parquet + perfumes.json + data dictionary.
+  [ ] Schema validation + tests; reproducible "make data".
+  [ ] EDA notebook: families, notes, seasons, houses, coverage, data quality.
+  Gate: 1,400+ usable perfumes; critical missing < 2%; all notes normalized;
+        pipeline reruns identically from raw data; attribution recorded.
+
+PHASE 3 - FEATURES, K-MEANS, SIMILARITY (2-3 days)
+  Tasks:
+  [ ] Build note-family/accord/top-note features; TF-IDF; SVD; normalize.
+  [ ] Tune k with silhouette/elbow; inspect and name clusters.
+  [ ] Build cosine similarity index and top-20 similar lists.
+  [ ] PCA 2-D coordinates for the cluster map.
+  [ ] Export artifacts + versioned metrics.json.
+  [ ] Unit tests: determinism, vector shapes, known similar pairs.
+  Gate: documented k choice; every cluster named and describable; 10 manual
+        similar-perfume spot checks pass.
+
+PHASE 4 - USER SIMULATION, TREE, RANKING, EVALUATION (3-4 days)
+  Tasks:
+  [ ] Define archetypes and hidden preference vectors.
+  [ ] Simulate users and pair labels; document generative assumptions.
+  [ ] Build pair features; GroupShuffleSplit by user.
+  [ ] Train and tune tree; export joblib + tree_rules.json.
+  [ ] Implement hybrid ranker + MMR + explanation templates.
+  [ ] Offline evaluation notebook and metrics table.
+  [ ] Leakage test (no user overlap; suspicious-accuracy audit).
+  Gate: honest metrics reported; explanations read naturally for 10 examples;
+        no leakage; recommendation baseline saved for comparison.
+
+PHASE 5 - DATABASE, AUTH, RLS (2 days)
+  Tasks:
+  [ ] Write migrations for all tables, indexes, views, triggers.
+  [ ] Enable RLS; policies for public read and owner-only writes.
+  [ ] Configure auth (email/password or magic link); profile trigger.
+  [ ] Seed catalogue + clusters + vectors into Supabase.
+  [ ] Generate TypeScript types; RLS integration tests (user A vs user B).
+  [ ] pgvector similarity RPC for "similar perfumes".
+  Gate: sign up/in works; catalogue browsable; user isolation proven; no
+        service-role key in the browser.
+
+PHASE 6 - API (2-3 days)
+  Tasks:
+  [ ] Endpoints: /health, /v1/recommend, /v1/explain, /v1/model/info,
+      /v1/taxonomy. Catalogue reads come from Supabase, not duplicated here.
+  [ ] Load artifacts once at startup; memory check under 512 MB.
+  [ ] Pydantic validation, CORS allowlist, rate limiting, gzip, structured logs.
+  [ ] Error contracts + tests (happy path, invalid input, cold start).
+  [ ] Docker build; deploy to Render; keepalive test.
+  Gate: OpenAPI docs complete; warm p95 < 300 ms; tests pass; cold-start
+        behavior documented with loading UX.
+
+PHASE 7 - DESIGN SYSTEM AND APP SHELL (2-3 days)
+  Tasks:
+  [ ] Tokens, fonts, gradients, grain, glass, motion variants.
+  [ ] Header, mobile bottom nav, footer, page transitions.
+  [ ] Component library and Storybook-style demo page (internal).
+  [ ] Skeleton, toast, error boundary, empty states.
+  [ ] PWA manifest, icons, service worker, install prompt.
+  Gate: responsive at 360/768/1280/1440; keyboard + reduced-motion checks;
+        installable on Android and desktop.
+
+PHASE 8 - CORE PAGES (4-6 days)
+  Tasks:
+  [ ] Landing, onboarding, discover, catalogue, detail, profile, auth, about,
+      404/offline.
+  [ ] URL-synced filters; server-side fetching/caching; optimistic feedback.
+  [ ] SEO: metadata, OG images, sitemap, robots, structured data.
+  [ ] Notes pyramid, family bars, season ribbon, cluster map, radar.
+  [ ] Review and collection flows.
+  Gate: complete flow on mobile and desktop; all loading/empty/error states;
+        no layout shift; every page has real content.
+
+PHASE 9 - PERSONALIZATION AND FEEDBACK LOOP (2-3 days)
+  Tasks:
+  [ ] Persist preferences; anonymous mode in localStorage; merge on signup.
+  [ ] Like/dislike updates Supabase and local profile immediately.
+  [ ] Personalized Discover request includes loved IDs/notes/filters.
+  [ ] Taste radar and cluster affinity computed from real feedback.
+  [ ] Why-this panel with supporting and conflicting evidence.
+  [ ] Saved collections; community reviews; perfume stats views.
+  Gate: 5 likes/dislikes visibly change the feed; no data loss on refresh;
+        guest-to-account merge works.
+
+PHASE 10 - HARDENING AND QA (3-4 days)
+  Tasks:
+  [ ] Unit tests: features, ranking invariants, explanations, filters.
+  [ ] Integration: API + Supabase; E2E Playwright critical paths.
+  [ ] Security: RLS audit, rate limits, input validation, CORS, secret scan,
+      dependency audit, auth edge cases.
+  [ ] Performance: bundle analysis, font/image optimization, cache headers.
+  [ ] Accessibility audit and fixes.
+  [ ] Cross-browser/device pass (Chrome Android, Safari iOS, Edge/Firefox PC).
+  [ ] Sentry, UptimeRobot, analytics; bug bash and severity triage.
+  Gate: zero open P1/P2 bugs; CI green; Lighthouse >= 90 performance and
+        accessibility on key pages; known issues documented.
+
+PHASE 11 - PRODUCTION LAUNCH (1-2 days)
+  Tasks:
+  [ ] Production env vars on Vercel/Render/Supabase; CORS locked to domain.
+  [ ] Run migrations; seed; smoke tests; verify auth emails.
+  [ ] Enable keepalive (GitHub Actions every 10 min) and Supabase daily ping.
+  [ ] Backups/export script; rollback runbook tested.
+  [ ] Final README, license/attribution, demo accounts (optional).
+  Gate: public URL works from a clean device; CI/CD deploys on push; rollback
+        tested; monitoring receives a test error/uptime event.
+
+PHASE 12 - ACADEMIC AND PORTFOLIO PACKAGING (2-3 days)
+  Tasks:
+  [ ] Report: abstract, intro, literature, data, methodology, results,
+      limitations, future work, references.
+  [ ] README with screenshots, architecture diagram, results, setup.
+  [ ] Model card + data dictionary.
+  [ ] Demo video script and recording.
+  [ ] Portfolio case study + LinkedIn post draft.
+  [ ] Viva Q&A: why simulated labels, leakage, cluster validity, cold start,
+      privacy, free-tier choices.
+  Gate: submission-ready report; 3-minute demo works offline; all links live.
+
+Total: ~27-37 focused days. Add 20% buffer for debugging and free-tier surprises.
+
+--------------------------------------------------------------------------------
+9. FREE-TIER ACCOUNTS AND LIMITS
+--------------------------------------------------------------------------------
+GitHub
+  Plan: Free. Public repo -> unlimited Actions minutes.
+  Need: repo URL, local git/gh auth. Do not share password.
+
+Vercel
+  Plan: Hobby (free). Personal/non-commercial; 100 GB bandwidth/month.
+  Use: Next.js frontend + preview deploys.
+  Need: GitHub connected; project imported; env vars set in dashboard.
+
+Render
+  Plan: Free web service. 512 MB RAM; sleeps after ~15 min inactivity; 750
+  hours/month. Cold start can be 30-60 s.
+  Use: FastAPI Docker service.
+  Mitigation: GitHub Actions ping /health every 10 min; skeleton UI; fallback
+  static content. Fallback host: Hugging Face Spaces Docker (2 vCPU/16 GB,
+  sleeps after 48 h).
+
+Supabase
+  Plan: Free. 500 MB DB, 1 GB storage, 50k MAU. Free projects pause after ~1
+  week of inactivity.
+  Use: Postgres + Auth + RLS + pgvector.
+  Mitigation: daily keepalive query via GitHub Actions; export backups.
+  Need: project URL + anon key in frontend env; service-role key only in local
+  scripts/CI secrets, never in the browser.
+
+Sentry
+  Plan: Free (5k errors/month). Optional but recommended.
+  Use: frontend + API error tracking.
+
+UptimeRobot
+  Plan: Free (50 monitors, 5-min checks).
+  Use: uptime alerts for web + API.
+
+Hugging Face / Kaggle
+  Plan: Free. Use HF for the Scento dataset and optional Streamlit Model Lab;
+  Kaggle account for optional secondary data.
+
+Cost tracker: $0.00. No paid domain; use scent-iq.vercel.app or similar.
+
+--------------------------------------------------------------------------------
+10. ENVIRONMENT AND SECRETS
+--------------------------------------------------------------------------------
+Local files:
+  .env.local (web) and .env (api), both gitignored.
+  .env.example committed with placeholders only.
+
+Web (.env.local):
+  NEXT_PUBLIC_SUPABASE_URL=
+  NEXT_PUBLIC_SUPABASE_ANON_KEY=
+  NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+  NEXT_PUBLIC_SENTRY_DSN=
+  NEXT_PUBLIC_SITE_URL=http://localhost:3000
+
+API (.env):
+  APP_ENV=development
+  ALLOWED_ORIGINS=http://localhost:3000
+  MODEL_DIR=./artifacts
+  SENTRY_DSN=
+  SUPABASE_URL=            (only for retrain/seed scripts, not runtime)
+  SUPABASE_SERVICE_ROLE_KEY= (only for retrain/seed scripts)
+
+CI secrets (GitHub):
+  SUPABASE_ACCESS_TOKEN, SUPABASE_DB_PASSWORD, SUPABASE_PROJECT_ID,
+  RENDER_DEPLOY_HOOK (optional), SENTRY_AUTH_TOKEN (optional).
+
+Security rules:
+  - Never commit .env files, keys, or dumps.
+  - Never paste the service-role key into chat or this log.
+  - The anon key is public by design; RLS must protect writes.
+  - Rotate any key that is accidentally exposed.
+
+Local ports: web 3000, API 8000, Supabase local 54321 (optional).
+
+--------------------------------------------------------------------------------
+11. CI/CD PIPELINE
+--------------------------------------------------------------------------------
+ci.yml (on pull_request and push to main):
+  job web: install (pnpm/npm ci) -> lint -> typecheck -> unit tests -> build
+  job api: install uv -> ruff -> pytest -> docker build (no push)
+  job e2e: start API + web -> Playwright smoke (home, catalogue, detail,
+           onboarding, recommend)
+  job security: npm audit --omit=dev, pip-audit, secret scan (gitleaks)
+  Cache dependencies; fail fast; required checks on main.
+
+db-migrate.yml (on push to main when supabase/migrations change):
+  supabase link -> supabase db push using repository secrets.
+
+keepalive.yml (cron every 10 minutes):
+  curl API /health; ping Supabase REST with a lightweight query.
+  Note: GitHub cron can be delayed under load; acceptable for a portfolio.
+
+retrain.yml (workflow_dispatch, manual):
+  export feedback from Supabase -> retrain -> evaluate -> upload artifacts ->
+  commit small artifacts -> redeploy API. Fails if metrics regress beyond a
+  threshold; never auto-deploy a worse model.
+
+Deploy:
+  Vercel and Render watch main and auto-deploy after CI.
+  Preview URL on every PR (Vercel).
+  Rollback: Vercel instant rollback; Render previous deploy; migrations are
+  forward-only with a documented manual rollback.
+
+Branching:
+  main protected; feature branches; conventional commits; PR template with
+  test plan and screenshots.
+
+--------------------------------------------------------------------------------
+12. TESTING AND QUALITY GATES
+--------------------------------------------------------------------------------
+Test pyramid:
+  Data: schema validation, cleaning idempotence, alias coverage, no dupes.
+  ML: deterministic seeds, vector shapes, cluster sanity, leakage test, ranking
+      invariants (budget respected, excluded items absent, no disliked-note
+      hard conflicts unless flagged), explanation snapshot tests.
+  API: pytest + httpx; validation errors; cold-start; rate limit; CORS.
+  Web: Vitest + React Testing Library for components/hooks; MSW for network.
+  E2E: Playwright for critical journeys on mobile + desktop viewports.
+  Manual: accessibility keyboard pass, screen reader spot check, device pass.
+
+PR definition of done:
+  [ ] Types pass, lint passes, tests added/updated, CI green.
+  [ ] No new console errors; loading/empty/error states included.
+  [ ] Responsive checked at 360/768/1280.
+  [ ] No secrets; no copied content/images.
+  [ ] Screenshots attached for UI changes.
+
+Bug severity:
+  P1 broken core flow/data loss/security -> fix immediately, block release.
+  P2 major visual/functional issue -> fix before release.
+  P3 minor -> backlog with owner and date.
+  Launch gate: zero P1/P2; documented known issues.
+
+Honest statement: "no bugs" cannot be guaranteed. The plan minimizes risk with
+types, tests, CI, preview environments, monitoring, and a rollback path.
+
+--------------------------------------------------------------------------------
+13. DEPLOYMENT RUNBOOK (FIRST LAUNCH)
+--------------------------------------------------------------------------------
+1. Create Supabase project; run migrations; verify RLS; seed catalogue.
+2. Deploy API to Render with MODEL_DIR and ALLOWED_ORIGINS; verify /health.
+3. Deploy web to Vercel with Supabase + API env vars; verify CORS.
+4. Configure Supabase auth redirect URLs for the Vercel domain.
+5. Run smoke tests: landing, signup, onboarding, recommend, feedback, detail,
+   review, mobile install.
+6. Enable keepalive, uptime monitor, Sentry; trigger a test event.
+7. Tag v1.0.0; write release notes; update this log.
+8. Export a database backup; store it privately (not in git).
+Rollback: Vercel rollback -> Render previous deploy -> DB restore only if a
+migration is destructive (we avoid destructive migrations).
+
+--------------------------------------------------------------------------------
+14. ACADEMIC DELIVERABLES
+--------------------------------------------------------------------------------
+Report outline:
+  1. Abstract
+  2. Introduction and objectives
+  3. Literature review (recommender systems, content-based filtering, K-Means,
+     decision trees, explainability)
+  4. Dataset and preprocessing (Scento, license, cleaning, limitations)
+  5. Methodology: features, K-Means, user simulation, decision tree, hybrid
+     ranking, explanation generation
+  6. Implementation: architecture, API, Supabase, PWA frontend, CI/CD
+  7. Results: clustering metrics, tree metrics, ranking metrics, real-user test
+  8. Discussion: leakage avoidance, simulated labels, cold start, bias, privacy
+  9. Limitations and future work
+  10. Conclusion and references
+
+Viva demo script:
+  - Show a real user journey on mobile and desktop.
+  - Open Model Lab: cluster map, cluster names, tree, feature importance.
+  - Explain why labels are simulated and how real feedback retrains the model.
+  - Show the evaluation table and the leakage guardrail.
+  - Show CI/CD, monitoring, and the public URL.
+
+Optional Streamlit Model Lab (only if the university requires Streamlit):
+  A small separate app/space that visualizes clusters and tree metrics. The
+  production product remains Next.js.
+
+--------------------------------------------------------------------------------
+15. RISK REGISTER
+--------------------------------------------------------------------------------
+Risk                              Impact  Mitigation
+Free API cold start               High    Keepalive + skeletons + static
+                                                  catalogue fallback
+Supabase project pause            High    Daily ping + weekly export
+512 MB API limit                  Medium  Lightweight numpy runtime, no pandas
+Dataset license / images          High    Scento only, attribution, generated art
+Label leakage makes metrics fake  High    Hidden-vector labels + user split test
+Popularity bias                   Medium  Diversity/MMR + novelty + coverage metric
+Scope creep                       High    Phase gates, MVP first, optional backlog
+Auth/RLS misconfiguration         High    RLS tests, no service key client-side
+Python missing on machine         Low     Install 3.12 in Phase 0
+Time pressure                     High    Cut optional features, not quality gates
+Mobile performance                Medium  CSS/SVG art, lazy charts, budget checks
+
+--------------------------------------------------------------------------------
+16. OPEN QUESTIONS AND BLOCKERS
+--------------------------------------------------------------------------------
+1. WORKFLOW DIAGRAM: the message ended with "work flow should be something like
+   this:" but no image/file was received. Still open; section 4 remains the
+   working flow. Resend or paste it to confirm no step is missing.
+2. GitHub: SOLVED. Repo exists at
+   https://github.com/hashiransari3000/Scent-IQ and is the origin. Local git
+   identity was unset; set per-repo before the first commit.
+3. Supabase: NOT CREATED / NOT REQUIRED FOR V1. Profiles are anonymous and live
+   in localStorage; the API is stateless. Supabase returns in Phase 5 for
+   accounts, cross-device profiles, community reviews and retraining data. Put
+   keys in local env files, never in chat.
+4. LIVE HOSTING ACCESS: Vercel and Render accounts/projects are not connected
+   yet. Everything needed is committed (apps/web, render.yaml, keepalive). A
+   Vercel import + Render Blueprint apply is the remaining manual step; see
+   docs/DEPLOYMENT.md.
+5. Deadline / defense date: still unknown, so the phase plan has not been
+   compressed. Tell us the date to prioritise the report/model card.
+6. Streamlit: still unknown whether the university requires it. The production
+   app is Next.js + FastAPI; an optional Read-only Model Lab can be added later.
+7. Auth decision: RESOLVED for v1 as anonymous-first. No accounts, no email, no
+   tracking; profile is browser-local and only sent when scoring. Accounts are
+   optional Phase 5 work.
+8. Python 3.12 / uv: SOLVED. Python 3.12 and uv are installed; uv lives at
+   C:/Users/Hashir/.local/bin/uv.exe on this machine.
+9. DECISION NEEDED: whether to spend the next session on Supabase accounts and
+   community reviews, or on the academic report + model card. Recommendation:
+   publish the current anonymous v1 first, then add accounts if time allows.
+
+--------------------------------------------------------------------------------
+17. PROGRESS LOG
+--------------------------------------------------------------------------------
+2026-11-16 | Phase 0 | Inspected workspace: empty; git 2.52 and node 24 present;
+  python not installed. Researched datasets (Scento, Kaggle Fragrantica, FragDB)
+  and free hosting options. Decided final stack and architecture. Created this
+  master log. No code written yet.
+  Next: user inputs (workflow diagram, repo, accounts) + install Python.
+
+2026-11-16 | Phase 0-1 | Toolchain + repository. Python 3.12 and uv installed
+  (uv at C:/Users/Hashir/.local/bin/uv.exe); user supplied
+  https://github.com/hashiransari3000/Scent-IQ as origin. Monorepo created:
+  apps/web, services/api, ml, data, supabase, docs, scripts, .github.
+  Next.js 16.4.6 / React 19.3 / Tailwind 4.3.3 / Motion 14 scaffolded; FastAPI
+  app with pytest, ruff and Dockerfile; .env.example and .gitignore written
+  before any key was needed.
+  Result: clean tree, no secrets (only empty placeholders).
+
+2026-11-16 | Phase 2-3 | Data + scent space. Scento CC BY 4.0 loaded and cleaned
+  to 1,478 perfumes / 160 houses / 420 note names / 14 families. Note pyramid
+  weights top 0.8, heart 1.0, base 1.25. TF-IDF -> TruncatedSVD(32) -> L2;
+  K-Means k=6 (silhouette 0.1541, DB 2.5875, cluster sizes 131-369); PCA-2
+  coordinates; cosine top-12 similar map. Exported artefacts + catalogue.json +
+  meta.json + metrics.json. Quality report: 100% note-use coverage.
+  Verification: ml tests 10 passed.
+
+2026-11-16 | Phase 4 | Simulation, decision tree, ranking. 12 archetypes x 30 =
+  360 simulated users; 57,600 pairs (30% positive); GroupShuffleSplit by user
+  with overlap 0. Tree: depth 6, 119 nodes, 60 leaves, class_weight balanced.
+  Accuracy 0.6105; ROC-AUC 0.6481; P@10 0.5256 vs 0.4033 family baseline (lift
+  1.303); NDCG@10 0.5319. Top features: season .407, family cosine .208,
+  popularity .196, price fit .151. Hybrid score 0.40 content + 0.30 tree + 0.20
+  cluster + 0.10 quality - 0.12 avoid conflict; MMR lambda 0.72.
+  Honest note: labels are simulated, so metrics measure simulator recovery.
+
+2026-11-16 | Phase 6 | API. FastAPI endpoints for health, recommend, explain,
+  catalogue, perfume, similar, model info and taxonomy. Pydantic schemas,
+  startup engine load (~1s warm), rate limit 120/min, CORS allowlist, optional
+  Sentry, Docker image. Local service verified at 127.0.0.1:8000/health:
+  1,478 perfumes / 6 clusters / 60 tree leaves. API tests 9 passed.
+  Fixed: ruff line lengths and import order; Windows path resolution for
+  MODEL_DIR.
+
+2026-11-16 | Phase 7-8 | Product UI. Built the design system (ink/ivory/amber/
+  rose/moss, Fraunces + Geist, generated family art, grain, motion with
+  prefers-reduced-motion) and pages: home, onboarding (4 steps), discover,
+  catalogue, perfume detail, profile, about, 404/error/loading, plus PWA
+  manifest, service worker, offline page, generated PNG icons, robots, sitemap
+  and JSON-LD. Split the 2.2 MB catalogue to server-only and shipped a 10.7 KB
+  meta.json to client components.
+  Verification: typecheck clean, lint clean, production build 113 pages.
+  Bugs fixed: Next 16 cacheComponents forbids route dynamic/dynamicParams;
+  unstable new Date() during prerender; lucide has no Github export; JSON cast
+  types; eslint set-state-in-effect policy documented.
+
+2026-11-16 | Phase 8 QA | Visual QA at 1440x1000 and true 390x844 via Chrome
+  DevTools device emulation. Reviewed home, catalogue, perfume, discover,
+  onboarding, profile, about, mobile menu. Fixed hero title/art overlap, pale
+  family tile contrast, a 4px horizontal overflow (overflow-x: clip), mobile
+  Discover hero pushing results below the fold, and an empty black toast pill
+  during fade-out. No console errors, no failed requests.
+  Next: interaction QA.
+
+2026-11-16 | Phase 9 | Interactive end-to-end QA with seeded localStorage
+  profiles. Verified: onboarding completes and persists all four steps;
+  /discover shows "Live hybrid model" with 24 of 1,477 considered; love updates
+  wardrobe and survives reload; season filter re-scores to 880 candidates;
+  perfume page shows 66 match with reasons + four breakdown bars; catalogue
+  deep link pre-applies Wood & Root + Winter + Premium (130 results, 3 chips);
+  profile shows 95% completion and 2-item wardrobe; mobile menu opens/closes and
+  restores scroll; 390px scrollWidth exactly 390.
+  App bug found and fixed: rapid same-frame family/season/time taps could
+  overwrite each other; toggles now use functional setState.
+  Remaining: live deployment credentials.
+
+2026-11-16 | Phase 10-11 prep | CI/CD and docs. Added .github/workflows/ci.yml
+  (web lint/typecheck/build, ML pytest, API pytest), keepalive.yml (10-minute
+  Render ping via repository variables), render.yaml Blueprint, security headers
+  in next.config.ts, README with architecture/metrics/screenshots and
+  docs/DEPLOYMENT.md. Hardened .dockerignore against env leakage and ignored
+  .screens/. Scanned tree for secrets: only empty placeholders in .env.example
+  and this log. npm ci + build pass; npm audit --omit=dev = 0 vulnerabilities
+  (7 moderate remain in the ESLint tooling only, no production impact).
+  Tests: ML 10 passed, API 9 passed.
+  Blocker: Vercel/Render projects need the user's account authorization; code
+  and config are ready to deploy.
+
+--------------------------------------------------------------------------------
+18. DECISION LOG
+--------------------------------------------------------------------------------
+D-001 | 2026-11-16 | Next.js PWA instead of Streamlit for production.
+  Reason: portfolio-grade UI, animations, mobile, SEO; Streamlit stays optional
+  as an academic Model Lab.
+D-002 | 2026-11-16 | PWA instead of native Android.
+  Reason: $0, one codebase, installable, offline; no store fees.
+D-003 | 2026-11-16 | Scento as the v1 dataset.
+  Reason: CC BY 4.0, clean, seasons/times, sufficient size; Kaggle optional.
+D-004 | 2026-11-16 | Supabase is system of record for catalogue + user data;
+  FastAPI is a stateless ML service.
+  Reason: site stays usable when the free API sleeps; reviews/ratings join
+  naturally; RLS secures user data.
+D-005 | 2026-11-16 | Render Free + GitHub Actions keepalive for the API.
+  Reason: simplest free Docker host; cold-start mitigation documented; HF Spaces
+  as fallback.
+D-006 | 2026-11-16 | No scraped brand images or reviews.
+  Reason: copyright risk; generated family art + original community content.
+D-007 | 2026-11-16 | Tree trained on simulated latent labels, then retrained on
+  real feedback.
+  Reason: no individual ratings in public data; latent-label simulation avoids
+  leakage; real loop provides credibility.
+D-008 | 2026-11-16 | Monorepo: apps/web, services/api, ml, supabase, docs.
+  Reason: one CI, one PR flow, easy portfolio review.
+D-009 | 2026-11-16 | Estimated price tiers, never fabricated exact prices.
+  Reason: no price data in the source; honesty preserves credibility.
+D-010 | 2026-11-16 | Catalogue data split: full catalogue.json stays server-only;
+  a 10.7 KB meta.json feeds client components.
+  Reason: keeps the 2.2 MB dataset out of the browser bundle while still letting
+  onboarding and profile render family/cluster labels instantly.
+D-011 | 2026-11-16 | On-device fallback ranker when the API is unreachable.
+  Reason: a sleeping free API must not produce an empty product; the UI now
+  degrades to a local scoring estimate and labels it honestly ("on-device
+  estimate") instead of pretending it is the live model.
+D-012 | 2026-11-16 | Anonymous-first v1: profile + feedback in localStorage, no
+  accounts, no database writes.
+  Reason: publishable without storing personal data, zero cost, zero auth
+  surface; Supabase accounts and RLS come after launch.
+D-013 | 2026-11-16 | Ranking blend 0.40 content / 0.30 tree / 0.20 cluster /
+  0.10 quality minus 0.12 avoid, then MMR re-rank at lambda 0.72.
+  Reason: content dominates because tree labels are simulated; cluster gives
+  diversity structure; MMR stops six near-identical ouds topping the list.
+D-014 | 2026-11-16 | Deploy web on Vercel Hobby, API on Render Free via
+  render.yaml Blueprint, keepalive from GitHub Actions.
+  Reason: all $0, reproducible config in the repo, no manual dashboard drift.
+D-015 | 2026-11-16 | No third-party photography; generated family artwork and
+  CSS/inline SVG only.
+  Reason: avoids licensing claims on a public portfolio site and keeps LCP fast
+  with no remote image hosts.
+D-016 | 2026-11-16 | Public read API with a permissive CORS default, tightened
+  after the live URL is known; rate limit 120/min.
+  Reason: the service returns no private data; the allowlist is still narrowed
+  post-deploy so other origins cannot burn the free instance.
+D-017 | 2026-11-16 | Treat visual and interaction QA as a gate before any
+  deployment.
+  Reason: three UI bugs (overflow, contrast, stale toggles) were only visible in
+  a running browser; screenshots at 1440 and 390 are stored in docs/media.
+D-018 | 2026-11-16 | No live Supabase project for v1; migration SQL is prepared
+  but not applied.
+  Reason: no catalogue or user data needs server persistence yet, and an unused
+  project with a service-role key is pure risk. Secrets stay in placeholders.
+
+--------------------------------------------------------------------------------
+19. IMMEDIATE NEXT ACTIONS
+--------------------------------------------------------------------------------
+DONE (2026-11-16):
+[x] Install Python 3.12, uv, Node 24 and verify git.
+[x] Monorepo skeleton, ML pipeline, API, full web app, tests, CI.
+[x] Visual + E2E QA and bug fixes.
+[x] Security headers verified on the production build:
+    X-Content-Type-Options, X-Frame-Options, Referrer-Policy,
+    Permissions-Policy all present on GET /.
+[x] Deployment scaffolding: render.yaml, ci.yml, keepalive.yml,
+    docs/DEPLOYMENT.md, README, docs/media screenshots.
+
+NEXT (requires the user's accounts, in this order):
+1. Git identity + push. Set repo-local git user.name/user.email to the GitHub
+   identity, then push main to
+   https://github.com/hashiransari3000/Scent-IQ. Confirm .env, .screens,
+   node_modules, .venv and .next are absent from the commit.
+2. Render: New > Blueprint > select the repo > Apply. Note the service URL and
+   confirm GET /health returns status ok with 1,478 perfumes.
+3. Vercel: Add Project > import the repo > Root Directory apps/web > env
+   NEXT_PUBLIC_API_BASE_URL=<render-url> and NEXT_PUBLIC_SITE_URL=<vercel-url>
+   > Deploy.
+4. GitHub repo Variables: API_HEALTH_URL=<render-url>/health and
+   WEB_URL=<vercel-url> so keepalive.yml works; run it once manually.
+5. Tighten ALLOWED_ORIGINS on Render to the Vercel domain, redeploy, and
+   re-check /health + one /v1/recommend call from the browser.
+6. Update this log with the live URLs and move the header status to LIVE.
+
+AFTER LAUNCH (choose one):
+[ ] Supabase accounts: schema + RLS, migrate profile/feedback, retrain hook.
+[ ] Academic pack: report, model card, demo script, optional Streamlit lab.
+[ ] Both, starting with the academic pack if a defense date is near.
+
+STILL OPEN FROM THE USER:
+[ ] Resend the workflow diagram (the earlier attempt arrived empty).
+[ ] Deadline / defense date.
+[ ] Whether Streamlit is a hard requirement for the university submission.
+
+================================================================================
+END OF CURRENT LOG - append new entries above this line before each session end.
+================================================================================

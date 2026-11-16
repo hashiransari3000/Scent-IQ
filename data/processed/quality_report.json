@@ -1,0 +1,158 @@
+{
+  "source_rows": 1479,
+  "clean_rows": 1478,
+  "duplicate_ids_removed": 0,
+  "unique_houses": 160,
+  "unique_notes": 420,
+  "note_use_coverage": 0.9977,
+  "unmapped_note_uses": 0.0023,
+  "top_unmapped_notes": [
+    [
+      "Cr\u00e8me Br\u00fbl\u00e9e",
+      2
+    ],
+    [
+      "Rosyfolia",
+      1
+    ],
+    [
+      "Gentian",
+      1
+    ],
+    [
+      "Tiger Liana",
+      1
+    ],
+    [
+      "Black Hemlock",
+      1
+    ],
+    [
+      "Crocus",
+      1
+    ],
+    [
+      "Safraleine",
+      1
+    ],
+    [
+      "Solar Salicylate",
+      1
+    ],
+    [
+      "Infinium",
+      1
+    ],
+    [
+      "Flouve",
+      1
+    ],
+    [
+      "Almdudler",
+      1
+    ],
+    [
+      "Dill",
+      1
+    ],
+    [
+      "Hydrangea",
+      1
+    ],
+    [
+      "Geraniol",
+      1
+    ],
+    [
+      "Palm Date",
+      1
+    ],
+    [
+      "Bouquet garni",
+      1
+    ],
+    [
+      "Calophyllum",
+      1
+    ],
+    [
+      "Heliotropin",
+      1
+    ],
+    [
+      "Lovage",
+      1
+    ],
+    [
+      "Mahonia",
+      1
+    ],
+    [
+      "Celery seeds",
+      1
+    ],
+    [
+      "Vodka",
+      1
+    ],
+    [
+      "Black Elder",
+      1
+    ],
+    [
+      "Monoi",
+      1
+    ],
+    [
+      "Palmarosa",
+      1
+    ],
+    [
+      "Fennel",
+      1
+    ],
+    [
+      "Aerial flower",
+      1
+    ]
+  ],
+  "missing": {
+    "year": 0.9459,
+    "popularity_rank": 0.5853,
+    "secondary_family": 0.2727
+  },
+  "family_distribution": {
+    "Wood & Root": 250,
+    "White Bloom": 234,
+    "Petal Garden": 186,
+    "Green Leaf": 156,
+    "Velvet Sweet": 150,
+    "Sunlit Citrus": 136,
+    "Spice Route": 124,
+    "Orchard Fruit": 103,
+    "Amber & Resin": 68,
+    "Powder Veil": 35,
+    "Skin Musk": 17,
+    "Smoke & Leather": 11,
+    "Salt & Mineral": 4,
+    "Oud Court": 4
+  },
+  "season_distribution": {
+    "spring": 1413,
+    "summer": 880,
+    "autumn": 1441,
+    "winter": 598
+  },
+  "price_tier_distribution": {
+    "1": 325,
+    "2": 403,
+    "3": 447,
+    "4": 303
+  },
+  "gender_distribution": {
+    "unisex": 1387,
+    "men": 62,
+    "women": 29
+  },
+  "empty_family_weights": 0
+}

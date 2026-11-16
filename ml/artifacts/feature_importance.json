@@ -1,0 +1,66 @@
+[
+  {
+    "feature": "season_match",
+    "importance": 0.40736
+  },
+  {
+    "feature": "family_cosine",
+    "importance": 0.20848
+  },
+  {
+    "feature": "popularity",
+    "importance": 0.19628
+  },
+  {
+    "feature": "price_fit",
+    "importance": 0.15056
+  },
+  {
+    "feature": "time_match",
+    "importance": 0.02564
+  },
+  {
+    "feature": "cluster_1",
+    "importance": 0.005
+  },
+  {
+    "feature": "cluster_3",
+    "importance": 0.00195
+  },
+  {
+    "feature": "concentration_score",
+    "importance": 0.00187
+  },
+  {
+    "feature": "cluster_0",
+    "importance": 0.0017
+  },
+  {
+    "feature": "cluster_2",
+    "importance": 0.00115
+  },
+  {
+    "feature": "note_overlap",
+    "importance": 0.0
+  },
+  {
+    "feature": "avoid_conflict",
+    "importance": 0.0
+  },
+  {
+    "feature": "cluster_affinity",
+    "importance": 0.0
+  },
+  {
+    "feature": "gender_match",
+    "importance": 0.0
+  },
+  {
+    "feature": "cluster_4",
+    "importance": 0.0
+  },
+  {
+    "feature": "cluster_5",
+    "importance": 0.0
+  }
+]

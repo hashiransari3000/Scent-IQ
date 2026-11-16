@@ -1,0 +1,39 @@
+name: Keepalive
+
+# Render's free web service sleeps after 15 minutes of inactivity and then
+# needs ~30-60 seconds to boot. Pinging every 10 minutes keeps the hybrid model
+# warm. GitHub's scheduler can drift a few minutes, so this is a mitigation,
+# not a guarantee; docs/DEPLOYMENT.md lists a backup external monitor.
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ping API health endpoint
+        env:
+          API_HEALTH_URL: ${{ vars.API_HEALTH_URL }}
+        run: |
+          if [ -z "$API_HEALTH_URL" ]; then
+            echo "::notice::Set the repository variable API_HEALTH_URL to enable keepalive."
+            exit 0
+          fi
+          curl -fsS --max-time 90 --retry 2 --retry-delay 10 "$API_HEALTH_URL"
+
+      - name: Ping web app
+        env:
+          WEB_URL: ${{ vars.WEB_URL }}
+        run: |
+          if [ -z "$WEB_URL" ]; then
+            echo "::notice::Set the repository variable WEB_URL to ping the frontend too."
+            exit 0
+          fi
+          curl -fsS --max-time 30 "$WEB_URL"

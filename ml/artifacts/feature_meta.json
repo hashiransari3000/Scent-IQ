@@ -1,0 +1,22 @@
+{
+  "tfidf_features": 330,
+  "svd_components": 32,
+  "explained_variance": 0.5258,
+  "documents": 1478,
+  "note_families": [
+    "wood_root",
+    "white_bloom",
+    "petal_garden",
+    "green_leaf",
+    "velvet_sweet",
+    "sunlit_citrus",
+    "spice_route",
+    "orchard_fruit",
+    "amber_resin",
+    "powder_veil",
+    "skin_musk",
+    "smoke_leather",
+    "salt_mineral",
+    "oud_court"
+  ]
+}

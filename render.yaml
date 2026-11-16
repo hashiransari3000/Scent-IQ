@@ -1,0 +1,25 @@
+# Render Blueprint for the ScentIQ recommendation API.
+# Deploy from: Render Dashboard -> New -> Blueprint -> this repository.
+# The frontend deploys separately on Vercel; see docs/DEPLOYMENT.md.
+
+services:
+  - type: web
+    name: scentiq-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./services/api/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: MODEL_DIR
+        value: /app/ml/artifacts
+      # The API is public and credential-free, so preview deployments are
+      # welcome. Tighten this to your Vercel domain after the first deploy.
+      - key: ALLOWED_ORIGINS
+        value: "*"
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "120"
