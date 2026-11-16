@@ -1,0 +1,17 @@
+{
+  "services": {
+    "scentiq-api": {
+      "root": ".",
+      "entrypoint": "index:app"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": {
+        "type": "service",
+        "service": "scentiq-api"
+      }
+    }
+  ]
+}

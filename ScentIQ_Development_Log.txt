@@ -4,11 +4,11 @@ SCENTIQ - MASTER DEVELOPMENT LOG AND BUILD PLAN
 Project      : ScentIQ - Intelligent Personalized Fragrance Recommendation
 Owner        : Hashir
 Started      : 2026-11-16
-Status       : v1 LIVE on the web (Phases 0-10); ML API image + deployment docs
-               ready for a free Hugging Face Docker Space (account step pending)
+Status       : v1 LIVE end-to-end - web + FastAPI API both on Vercel Hobby,
+               $0 and no card (large-functions beta carries the ML bundle)
 Repo         : https://github.com/hashiransari3000/Scent-IQ
 Production   : Web - https://scent-iq.vercel.app (live)
-               API - https://<hf-user>-scentiq-api.hf.space (Space not created yet)
+               API - https://scentiq-api.vercel.app (live, Vercel service)
 Budget       : $0.00 (hard constraint)
 Log rule     : This file is the single source of truth. Append every work session.
 
@@ -967,6 +967,27 @@ Mobile performance                Medium  CSS/SVG art, lazy charts, budget check
   NEXT_PUBLIC_API_BASE_URL in Vercel Production, redeploy, verify /health and
   the "Live hybrid model" badge.
 
+2026-11-16 | API live | ScentIQ API is live at https://scentiq-api.vercel.app.
+  Hugging Face signup worked (Hashir17), but the Docker SDK is now a paid PRO
+  feature (Gradio too); the free plan only offers Static Spaces, so a Space
+  could never run FastAPI. Render still requires a card. Deployed the existing
+  FastAPI app to Vercel as a Python service instead:
+  - root index.py re-exports app from services/api and adds ml/src to sys.path;
+  - root requirements.txt installs the API + ML stack (uvicorn not needed);
+  - vercel.json declares services.scentiq-api root "." entrypoint "index:app"
+    plus a catch-all service rewrite (vercel link generated the skeleton);
+  - the first build failed at 550.02 MB against the 500 MB Python limit;
+    VERCEL_SUPPORT_LARGE_FUNCTIONS=1 enabled the free large-functions beta and
+    the build completed in 59 s.
+  Set ALLOWED_ORIGINS=https://scent-iq.vercel.app and APP_ENV=production, then
+  deployed. Verified: /health ok with 1,478 perfumes, 6 clusters, 60 leaves,
+  load 2.2 s and a 1.3 s cold request; OPTIONS /v1/recommend returns 200 with
+  the right allow-origin; POST /v1/recommend returns ranked items.
+  Set NEXT_PUBLIC_API_BASE_URL in the web project and redeployed; the shipped
+  bundle embeds https://scentiq-api.vercel.app. Web CLI commands now need
+  --project scent-iq because the root services config changes project
+  resolution from apps/web. Hugging Face Space files were deleted (D-022).
+
 --------------------------------------------------------------------------------
 18. DECISION LOG
 --------------------------------------------------------------------------------
@@ -1043,6 +1064,18 @@ D-021 | 2026-11-16 | Host the ranking API on a Hugging Face Docker Space.
   and cold-start in 30-60 s; the on-device ranker covers that window and the UI
   labels the source honestly. Render remains the warm alternative if a card is
   ever added.
+D-022 | 2026-11-16 | Reverse D-021: drop Hugging Face Spaces.
+  Reason: Docker and Gradio Spaces now require a paid PRO plan; free accounts
+  only get Static Spaces, which cannot run FastAPI. The account was created but
+  is unused. The prepared Space Dockerfile/README were deleted so the repo does
+  not document a dead path.
+D-023 | 2026-11-16 | Run the FastAPI API as a Vercel Python service with large
+  functions enabled.
+  Reason: $0 on the existing account, no card, same repo, no sleep. The bundle
+  is 550 MB (scientific stack) against a 500 MB standard limit; the free
+  large-functions beta (VERCEL_SUPPORT_LARGE_FUNCTIONS=1) allows up to 5 GB.
+  Root index.py + requirements.txt + vercel.json are the minimal glue; the
+  Render Blueprint stays as a documented alternative.
 
 --------------------------------------------------------------------------------
 19. IMMEDIATE NEXT ACTIONS
@@ -1060,21 +1093,15 @@ DONE (2026-11-16):
 [x] Pushed 49afdba + ffb1d62; CI run 43868858191 green on web, ML and API.
 [x] WEB IS LIVE: https://scent-iq.vercel.app (Vercel CLI, Production, HTTP 200).
 
-NEXT (API only; host chosen: Hugging Face Spaces, D-021):
-1. Account holder signs up or logs in at https://huggingface.co/join. No card,
-   and no password is shared with the agent.
-2. New Space -> scentiq-api -> Docker -> Blank -> CPU basic (free). Upload
-   docs/huggingface-space/README.md and Dockerfile at the Space root; wait for
-   the build.
-3. Copy https://<user>-scentiq-api.hf.space and check GET /health returns
-   status ok with 1,478 perfumes.
-4. Set NEXT_PUBLIC_API_BASE_URL to that URL in Vercel Production and redeploy:
-   cd apps/web && vercel --prod --yes.
-5. Verify one /v1/recommend call from the live site and the "Live hybrid model"
-   badge on /discover.
-6. Update this log and README with the API URL and final status.
-Fallback if the Space is blocked: Render Blueprint (needs a card) or on-device
-only.
+[x] API IS LIVE: https://scentiq-api.vercel.app (Vercel Python service,
+    large-functions beta, CORS locked to the web origin).
+[x] Web redeployed with NEXT_PUBLIC_API_BASE_URL and verified the bundle.
+
+NEXT (housekeeping + next phase):
+1. Commit/push the serverless glue (index.py, requirements.txt, vercel.json,
+   .vercelignore) and the updated README, deployment guide and log.
+2. Confirm the Vercel Git integration redeploys both projects on push.
+3. Pick the next phase: Supabase accounts/feedback or the academic pack.
 
 AFTER LAUNCH (choose one):
 [ ] Supabase accounts: schema + RLS, migrate profile/feedback, retrain hook.
@@ -1082,7 +1109,6 @@ AFTER LAUNCH (choose one):
 [ ] Both, starting with the academic pack if a defense date is near.
 
 STILL OPEN FROM THE USER:
-[ ] Hugging Face account + Space creation (only the account holder can do this).
 [ ] Resend the workflow diagram (the earlier attempt arrived empty).
 [ ] Deadline / defense date.
 [ ] Whether Streamlit is a hard requirement for the university submission.

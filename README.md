@@ -2,7 +2,7 @@
 
 **An intelligent, explainable fragrance recommender — not another perfume list.**
 
-**Live:** https://scent-iq.vercel.app
+**Live:** https://scent-iq.vercel.app · **API:** https://scentiq-api.vercel.app
 
 ScentIQ turns 1,478 perfumes into a searchable scent space, learns what you like
 from a 90-second profile and your feedback, and recommends bottles with a match
@@ -89,8 +89,8 @@ limitations are documented on `/about` and in the development log.
 | Motion | Motion (React) | Purposeful, reduced-motion-aware animation |
 | API | FastAPI + scikit-learn + NumPy/pandas | Small, typed, stateless ML service |
 | ML | scikit-learn, joblib, pyarrow | Reproducible offline pipeline |
-| Hosting | Vercel Hobby + Render Free | $0, both deploy from GitHub |
-| CI | GitHub Actions | Lint, types, build, ML + API tests, keepalive |
+| Hosting | Vercel Hobby (web + Python API) | $0, one account, no card; large-functions beta fits the ML bundle |
+| CI | GitHub Actions | Lint, types, build, ML + API tests (+ optional Render keepalive) |
 
 Taste profiles live in `localStorage`; there is no auth or database in v1. The
 frontend falls back to an **on-device ranker** if the free API is cold, so the
@@ -106,8 +106,11 @@ ml/artifacts          Trained models, vectors, metrics, similar map
 data/processed        Clean catalogue (raw data is not redistributed)
 docs                  Deployment guide and media
 scripts               PWA icon generator
-.github/workflows     CI + keepalive
-render.yaml           Render Blueprint for the API
+.github/workflows     CI (+ Render keepalive, unused on Vercel)
+render.yaml           Render Blueprint for the API (card required now)
+index.py              Vercel serverless entrypoint re-exporting the FastAPI app
+requirements.txt      Python deps installed by the Vercel API build
+vercel.json           Vercel service definition + catch-all route
 ScentIQ_Development_Log.txt  Full build log, decisions and phase plan
 ```
 
@@ -150,12 +153,16 @@ cd services/api && uv run pytest
 
 Step-by-step: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md). In short:
 
-1. Render → New Blueprint → this repo. It builds the API from
-   `services/api/Dockerfile` using `render.yaml`.
-2. Vercel → import this repo with **Root Directory `apps/web`**, then set
-   `NEXT_PUBLIC_API_BASE_URL` and `NEXT_PUBLIC_SITE_URL`.
-3. Add GitHub Actions variables `API_HEALTH_URL` and `WEB_URL` so the free API
-   stays warm.
+1. **API:** from the repo root, `vercel link --project scentiq-api` then
+   `vercel --prod`. The root `vercel.json` routes every path to the FastAPI app
+   via `index:app`; `vercel env add ALLOWED_ORIGINS production` locks CORS to
+   the web origin. If the 500 MB bundle limit is hit, set
+   `VERCEL_SUPPORT_LARGE_FUNCTIONS=1` (free beta) and redeploy.
+2. **Web:** Vercel project with **Root Directory `apps/web`**, then set
+   `NEXT_PUBLIC_API_BASE_URL=https://scentiq-api.vercel.app` and
+   `NEXT_PUBLIC_SITE_URL=https://scent-iq.vercel.app`.
+3. Optional: `render.yaml` remains for a warm container on Render, which now
+   requires a payment method for identity verification.
 
 ## Data and attribution
 
@@ -166,15 +173,14 @@ tiers, never fabricated retail prices.
 
 ## Status and roadmap
 
-Shipped: live web app at https://scent-iq.vercel.app, catalogue, perfume pages,
+Shipped: live web app at https://scent-iq.vercel.app with the FastAPI ranking
+service live at https://scentiq-api.vercel.app — catalogue, perfume pages,
 onboarding, hybrid discovery, explanations, feedback, profile, scent map, PWA,
-SEO, CI, deployment configuration. The Python ranking API is wired for Render but
-awaits a payment method on the free tier; until then discovery uses the
-on-device ranker.
+SEO, CI, deployment configuration. Both run on Vercel Hobby for $0; the API's
+scientific stack fits through the large-functions beta.
 
 Next, in priority order:
 
-- Live ML API URL and redeploy (Render Blueprint or Hugging Face Spaces).
 - Supabase: anonymous feedback table with RLS, optional accounts, cross-device
   profiles.
 - Community ratings/reviews (original content) and saved collections.
