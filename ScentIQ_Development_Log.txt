@@ -925,7 +925,12 @@ Mobile performance                Medium  CSS/SVG art, lazy charts, budget check
   checkout has no Next type references; local tsc only passed because .next
   existed. Fix: "typecheck" now runs "next typegen && tsc --noEmit", verified by
   deleting .next + next-env.d.ts and reproducing (typegen regenerates both,
-  tsc exit 0). Re-run queued with the fix commit.
+  tsc exit 0). Committed locally as 49afdba.
+  Blocker: the follow-up push could not authenticate - this machine has no
+  stored GitHub credential (no SSH key, empty Windows vault, GCM prompt only).
+  The first push succeeded while the Qoder credential selector was active; after
+  it exited, non-interactive pushes fail. User must sign in / provide a scoped
+  token, then run: git push origin main.
   Lesson: any CI step that runs tsc must generate Next's route types first.
 
 --------------------------------------------------------------------------------
@@ -1007,7 +1012,9 @@ DONE (2026-11-16):
 
 NEXT (requires the user's accounts, in this order):
 1. [x] Push commit ba175ce to https://github.com/hashiransari3000/Scent-IQ.
-   [ ] Watch the CI run for that commit finish green (web, ml, api).
+   [ ] Re-authenticate git and push 49afdba (CI typecheck fix), then confirm
+       all three CI jobs are green for the latest commit.
+   Important: the deployed web build must come from the fixed commit.
 2. Render: New > Blueprint > select the repo > Apply. Note the service URL and
    confirm GET /health returns status ok with 1,478 perfumes.
 3. Vercel: Add Project > import the repo > Root Directory apps/web > env
