@@ -988,6 +988,19 @@ Mobile performance                Medium  CSS/SVG art, lazy charts, budget check
   --project scent-iq because the root services config changes project
   resolution from apps/web. Hugging Face Space files were deleted (D-022).
 
+2026-11-16 | Incident | A Git push briefly replaced the web site with the API.
+  The API project lives at the repo root. The first push after creating it
+  triggered the web project's Git build, whose Root Directory was still "Auto"
+  (the Vercel monorepo UI had previously reset apps/web back to ./). That build
+  ran at the root, picked up vercel.json's FastAPI service, and its production
+  deployment took over scent-iq.vercel.app: / returned the API JSON and
+  /discover returned 404. Diagnosed by curling / and comparing vercel alias ls.
+  Fixed by redeploying from apps/web (22 s) and pinning the setting:
+  vercel project update scent-iq --root-directory apps/web.
+  Lesson: with a polyglot repo root, every Vercel project must pin its Root
+  Directory. CLI deploys use the local cwd, so they can mask a wrong project
+  setting until the next Git-triggered build.
+
 --------------------------------------------------------------------------------
 18. DECISION LOG
 --------------------------------------------------------------------------------
@@ -1076,6 +1089,11 @@ D-023 | 2026-11-16 | Run the FastAPI API as a Vercel Python service with large
   large-functions beta (VERCEL_SUPPORT_LARGE_FUNCTIONS=1) allows up to 5 GB.
   Root index.py + requirements.txt + vercel.json are the minimal glue; the
   Render Blueprint stays as a documented alternative.
+D-024 | 2026-11-16 | Pin the web project's Root Directory to apps/web on Vercel.
+  Reason: with the API service at the repo root, an unpinned web project built
+  from . on every Git push and overwrote scent-iq.vercel.app with the API
+  (D-024 incident above). CLI deploys from apps/web had hidden the wrong
+  setting. Root Directory is now explicit and recorded in docs/DEPLOYMENT.md.
 
 --------------------------------------------------------------------------------
 19. IMMEDIATE NEXT ACTIONS

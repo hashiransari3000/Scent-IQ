@@ -95,6 +95,10 @@ PRO), so they are not an option for this project.
 
 1. Vercel Dashboard → **Add New…** → **Project** → import `Scent-IQ`.
 2. **Root Directory:** `apps/web` (important; do not build the monorepo root).
+   Git pushes build from this directory. The repo root now hosts the Python API
+   service, so an unpinned root would deploy the API at `scent-iq.vercel.app`.
+   The CLI uses the current directory instead — run web commands from `apps/web`
+   with `--project scent-iq`.
 3. Framework preset: **Next.js**. Build command and output stay default.
 4. Add environment variables (Production and Preview):
 
